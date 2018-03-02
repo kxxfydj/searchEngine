@@ -16,8 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 线程相关工具类.
- * 
- * @author calvin
+ *
  */
 public class Threads {
 

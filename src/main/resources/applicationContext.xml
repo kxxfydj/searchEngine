@@ -9,17 +9,17 @@
     <!--<import resource="classpath:spring-mybatis.xml"/>-->
     <import resource="classpath:dispatcher-servlet.xml" />
 
-    <!--<bean id="propertyResources" class="java.util.ArrayList">-->
-        <!--<constructor-arg>-->
-            <!--<list>-->
-                <!--&lt;!&ndash;<value></value>&ndash;&gt;-->
-            <!--</list>-->
-        <!--</constructor-arg>-->
-    <!--</bean>-->
+    <bean id="propertyResources" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <value>classpath:log4j.properties</value>
+            </list>
+        </constructor-arg>
+    </bean>
 
-    <!--<bean id="settings"  class="org.springframework.beans.factory.config.PropertiesFactoryBean">-->
-        <!--<property name="locations" ref="propertyResources" />-->
-    <!--</bean>-->
+    <bean id="settings"  class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations" ref="propertyResources" />
+    </bean>
 
     <!--<bean class="com.kaikai.utils.ApplicationContextUtils" lazy-init="false"></bean>-->
 </beans>

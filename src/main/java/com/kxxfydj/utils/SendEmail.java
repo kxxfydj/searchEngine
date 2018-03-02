@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * Created by Administrator on 2017/7/7.
+ * Created by kxxfydj on 2017/7/7.
  */
 public class SendEmail {
     private static final String FORM = "18826137380@163.com";

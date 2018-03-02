@@ -11,7 +11,7 @@ import java.util.List;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Created by ChenWei on 2016/7/22.
+ * Created by kxxfydj on 2018/3/2.
  */
 public class ImageUtil {
 	private static final Logger log = getLogger(ImageUtil.class);
@@ -191,7 +191,7 @@ public class ImageUtil {
 
 	/**
 	 * 切割图片
-	 * @param imageByte
+	 * @param image
 	 * @param x
 	 * @param y
 	 * @param width

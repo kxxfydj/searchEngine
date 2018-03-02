@@ -1,9 +1,7 @@
 package com.kxxfydj.webmagicext;
 
-import com.cardniu.socialsecurity.common.enums.StepEnum;
-import com.cardniu.socialsecurity.common.log.TraceLogger;
-import com.cardniu.socialsecurity.common.util.URLUtil;
 import com.google.common.collect.Sets;
+import com.kxxfydj.utils.URLUtil;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -100,7 +98,6 @@ public class MyHttpClientDownloader extends HttpClientDownloader {
 			if (site.getCycleRetryTimes() > 0) {
 				return addToCycleRetryRetrunResponse(request, site);
 			}
-			TraceLogger.infoLog(StepEnum.REQUEST_EXCEPTION.getStepName(), TIME_OUT_CODE, ex.getMessage());
 			onError(request);
 		} catch (IOException e) {
 		    statusCode = UNKNOWN_CODE;
@@ -108,7 +105,6 @@ public class MyHttpClientDownloader extends HttpClientDownloader {
 			if (site.getCycleRetryTimes() > 0) {
 				return addToCycleRetryRetrunResponse(request, site);
 			}
-			TraceLogger.infoLog(StepEnum.REQUEST_EXCEPTION.getStepName(), UNKNOWN_CODE, e.getMessage());
 			onError(request);
 		} finally {
 			request.putExtra(Request.STATUS_CODE, statusCode);
