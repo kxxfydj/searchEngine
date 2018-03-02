@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * Created by kxxfydj on 2018/2/13.
  */
 @Controller
-@RequestMapping("")
+@RequestMapping("search/searchCode")
 public class CodeController {
 
 }
