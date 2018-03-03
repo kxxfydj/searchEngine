@@ -11,7 +11,7 @@ public abstract class CrawlerBase implements Crawler {
     protected CrawlerConfig crawlerConfig;
 
     protected Site site = Site.me().
-            setDomain("api.51datakey.com")
+            setDomain("github.com")
             .setSleepTime(0);
 
     @Override

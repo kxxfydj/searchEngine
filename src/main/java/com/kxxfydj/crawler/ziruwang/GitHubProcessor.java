@@ -1,30 +1,19 @@
 package com.kxxfydj.crawler.ziruwang;
 
 import com.kxxfydj.common.CommonTag;
-import com.kxxfydj.utils.RegexUtils;
-import com.kxxfydj.utils.RequestUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
-import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * create by kaiming_xu on 2017/9/2
  */
-public class ZiRuProcessor implements PageProcessor{
+public class GitHubProcessor implements PageProcessor{
 
-    private static Logger logger = LoggerFactory.getLogger(ZiRuProcessor.class);
+    private static Logger logger = LoggerFactory.getLogger(GitHubProcessor.class);
 
     private Site site;
 //
@@ -32,24 +21,24 @@ public class ZiRuProcessor implements PageProcessor{
 //
 //    private AtomicInteger pageCount = new AtomicInteger(0);
 //
-    public ZiRuProcessor(Site site) {
+    public GitHubProcessor(Site site) {
         this.site = site;
     }
 //
     @Override
     public void process(Page page) {
-//        String type = (String) page.getRequest().getExtra(CommonTag.TYPE);
-//
-//        if(CommonTag.HOME_PAGE.equals(type)){
-//            processHomePage(page);
-//        }else if(CommonTag.REGION_PAGE.equals(type)){
-//            processRegionPage(page);
-//        }
+        String type = (String) page.getRequest().getExtra(CommonTag.TYPE);
+
+        if(CommonTag.HOME_PAGE.equals(type)){
+            processHomePage(page);
+        }else if(CommonTag.REGION_PAGE.equals(type)){
+            processRegionPage(page);
+        }
     }
 //
 //
-//    private void processHomePage(Page page){
-//        Document document = page.getHtml().getDocument();
+    private void processHomePage(Page page){
+        Document document = page.getHtml().getDocument();
 //        Elements lis = document.select("#selection > div > div > dl.clearfix.zIndex6 > dd > ul > li");
 //        lis.remove(0);
 //
@@ -60,13 +49,13 @@ public class ZiRuProcessor implements PageProcessor{
 //            pageCount.incrementAndGet();
 //            page.addTargetRequest(request);
 //        }
-//    }
+    }
 //
 //    /**
 //     *
 //     * @param page
 //     */
-//    private void processRegionPage(Page page){
+    private void processRegionPage(Page page){
 //        Document document = page.getHtml().getDocument();
 //        Elements homeNodes = document.select("#houseList").get(0).children();
 //
@@ -94,7 +83,7 @@ public class ZiRuProcessor implements PageProcessor{
 //            page.putField(CommonTag.FINISHED,true);
 //        }
 //
-//    }
+    }
 //
 //    private House processImageUrl(Element element){
 //        String imageUrl = "http:" + element.select(".img.pr").first().getElementsByTag("img").attr("src");

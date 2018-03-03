@@ -2,10 +2,17 @@ import com.kxxfydj.utils.ApacheFetchUtils;
 import com.kxxfydj.utils.ApacheHttpRequestData;
 import com.kxxfydj.utils.HeaderUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Map;
@@ -22,8 +29,8 @@ public class DownloadTest {
     private static Map<String, String> requestHeaderMap;
 
     static {
-        requestHeaderMap = HeaderUtils.initPostHeaders("codeload.github.com",
-                "https://github.com/TheAlgorithms/Java",
+        requestHeaderMap = HeaderUtils.initPostHeaders("github.com",
+                "https://github.com/",
                 "application/x-www-form-urlencoded",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
     }
@@ -35,12 +42,54 @@ public class DownloadTest {
         try(FileOutputStream bos = new FileOutputStream(file)) {
             ApacheHttpRequestData apacheHttpRequestData = new ApacheHttpRequestData();
             apacheHttpRequestData.setHeaders(requestHeaderMap);
+            apacheHttpRequestData.setFiddlerProxy();
             byte[] binaryData = ApacheFetchUtils.getBytes(apacheHttpRequestData, "https://codeload.github.com/TheAlgorithms/Java/zip/master");
 
             bos.write(binaryData);
             bos.flush();
         }catch (Exception e){
             logger.error(e.getMessage(),e);
+        }
+    }
+
+    @Test
+    public void testSearchGitHub(){
+
+        try {
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            } };
+
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Fetch url
+            String url = "https://github.com/search?utf8=%E2%9C%93&q=java&type=";
+
+            Connection.Response response = Jsoup //
+                    .connect(url) //
+                    .timeout(60000) //
+                    .method(Connection.Method.GET) //
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0") //
+                    .header("Host","github.com")
+                    .header("Referer","https://github.com/")
+                    .execute();
+
+            Document document = response.parse();
+            System.out.println(document);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

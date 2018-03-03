@@ -14,15 +14,15 @@ import us.codecraft.webmagic.Spider;
  * create by kaiming_xu on 2017/9/2
  */
 @Crawl
-public class ZiRuCrawler extends CrawlerBase{
+public class GitHubCrawler extends CrawlerBase{
 
     @Override
     public void run() {
-        Request request = new Request("http://sz.ziroom.com/z/nl/z3.html");
+        Request request = new Request("https://github.com/search?utf8=%E2%9C%93&q=java&type=");
         request.putExtra(CommonTag.TYPE,CommonTag.HOME_PAGE);
 
         Spider spider = Spider
-                .create(new ZiRuProcessor(site))
+                .create(new GitHubProcessor(site))
                 .setDownloader(new MyHttpDownloader())
                 .addRequest(request)
                 .setScheduler(new MyQueueScheduler())
