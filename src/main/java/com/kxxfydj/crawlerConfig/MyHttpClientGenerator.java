@@ -106,7 +106,10 @@ public class MyHttpClientGenerator extends HttpClientGenerator {
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(site.getRetryTimes(), true));
         }
         myGenerateCookie(httpClientBuilder, site);
-        return httpClientBuilder.build();
+        System.setProperty("https.protocols","TLSv1.2");
+        return httpClientBuilder
+                .useSystemProperties()
+                .build();
     }
 
     private void myGenerateCookie(HttpClientBuilder httpClientBuilder, Site site) {
@@ -116,13 +119,14 @@ public class MyHttpClientGenerator extends HttpClientGenerator {
             cookie.setDomain(site.getDomain());
             cookieStore.addCookie(cookie);
         }
+
         addCookies(site.getAllCookies());
         httpClientBuilder.setDefaultCookieStore(cookieStore);
     }
 
     private static SSLContext createIgnoreVerifySSL(){
         try {
-            SSLContext sc = SSLContext.getInstance("SSLv3");
+            SSLContext sc = SSLContext.getInstance("TLSv1.2");
             // 实现一个X509TrustManager接口，用于绕过验证，不用修改里面的方法
             X509TrustManager trustManager = new X509TrustManager() {
                 @Override
