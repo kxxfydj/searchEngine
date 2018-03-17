@@ -1,5 +1,3 @@
-import com.kxxfydj.utils.ApacheFetchUtils;
-import com.kxxfydj.utils.ApacheHttpRequestData;
 import com.kxxfydj.utils.HeaderUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
@@ -13,7 +11,12 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -36,28 +39,30 @@ public class DownloadTest {
     }
 
     @Test
-    public void test(){
-        File file = new File("C:\\Users\\kxxfydj\\Desktop\\theAlgorithms.zip");
-
-        try(FileOutputStream bos = new FileOutputStream(file)) {
-            ApacheHttpRequestData apacheHttpRequestData = new ApacheHttpRequestData();
-            apacheHttpRequestData.setHeaders(requestHeaderMap);
-            apacheHttpRequestData.setFiddlerProxy();
-            byte[] binaryData = ApacheFetchUtils.getBytes(apacheHttpRequestData, "https://codeload.github.com/TheAlgorithms/Java/zip/master");
-
-            bos.write(binaryData);
-            bos.flush();
-        }catch (Exception e){
-            logger.error(e.getMessage(),e);
-        }
+    public void test() {
+//        File file = new File("C:\\Users\\kxxfydj\\Desktop\\theAlgorithms.zip");
+//
+//        try(FileOutputStream bos = new FileOutputStream(file)) {
+//            ApacheHttpRequestData apacheHttpRequestData = new ApacheHttpRequestData();
+//            apacheHttpRequestData.setHeaders(requestHeaderMap);
+//            apacheHttpRequestData.setFiddlerProxy();
+//            byte[] binaryData = ApacheFetchUtils.getBytes(apacheHttpRequestData, "https://codeload.github.com/TheAlgorithms/Java/zip/master");
+//
+//            bos.write(binaryData);
+//            bos.flush();
+//        }catch (Exception e){
+//            logger.error(e.getMessage(),e);
+//        }
+        System.out.println(System.getProperty("user.dir"));
     }
 
     @Test
-    public void testSearchGitHub(){
+    public void testSearchGitHub() {
 
         try {
+//            System.setProperty("javax.net.debug", "all");
             // Create a trust manager that does not validate certificate chains
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
@@ -67,7 +72,7 @@ public class DownloadTest {
 
                 public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
                 }
-            } };
+            }};
 
             // Install the all-trusting trust manager
             SSLContext sc = SSLContext.getInstance("SSL");
@@ -77,13 +82,15 @@ public class DownloadTest {
             // Fetch url
             String url = "https://github.com/search?utf8=%E2%9C%93&q=java&type=";
 
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8888));
             Connection.Response response = Jsoup //
                     .connect(url) //
                     .timeout(60000) //
                     .method(Connection.Method.GET) //
+                    .proxy(proxy)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0") //
-                    .header("Host","github.com")
-                    .header("Referer","https://github.com/")
+                    .header("Host", "github.com")
+                    .header("Referer", "https://github.com/")
                     .execute();
 
 
@@ -96,32 +103,28 @@ public class DownloadTest {
 
     /**
      * 解压缩zip包
-     * @param zipFilePath zip文件的全路径
-     * @param unzipFilePath 解压后的文件保存的路径
+     *
+     * @param zipFilePath        zip文件的全路径
+     * @param unzipFilePath      解压后的文件保存的路径
      * @param includeZipFileName 解压后的文件保存的路径是否包含压缩文件的文件名。true-包含；false-不包含
      */
     @SuppressWarnings("unchecked")
-    public static void unzip(String zipFilePath, String unzipFilePath, boolean includeZipFileName) throws Exception
-    {
-        if (StringUtils.isEmpty(zipFilePath) || StringUtils.isEmpty(unzipFilePath))
-        {
+    public static void unzip(String zipFilePath, String unzipFilePath, boolean includeZipFileName) throws Exception {
+        if (StringUtils.isEmpty(zipFilePath) || StringUtils.isEmpty(unzipFilePath)) {
             throw new Exception("zip解压出错！");
         }
         File zipFile = new File(zipFilePath);
         //如果解压后的文件保存路径包含压缩文件的文件名，则追加该文件名到解压路径
-        if (includeZipFileName)
-        {
+        if (includeZipFileName) {
             String fileName = zipFile.getName();
-            if (StringUtils.isNotEmpty(fileName))
-            {
+            if (StringUtils.isNotEmpty(fileName)) {
                 fileName = fileName.substring(0, fileName.lastIndexOf("."));
             }
             unzipFilePath = unzipFilePath + File.separator + fileName;
         }
         //创建解压缩文件保存的路径
         File unzipFileDir = new File(unzipFilePath);
-        if (!unzipFileDir.exists() || !unzipFileDir.isDirectory())
-        {
+        if (!unzipFileDir.exists() || !unzipFileDir.isDirectory()) {
             unzipFileDir.mkdirs();
         }
 
@@ -134,34 +137,28 @@ public class DownloadTest {
         BufferedInputStream bis = null;
         BufferedOutputStream bos = null;
         ZipFile zip = new ZipFile(zipFile);
-        Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>)zip.entries();
+        Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
         //循环对压缩包里的每一个文件进行解压
-        while(entries.hasMoreElements())
-        {
+        while (entries.hasMoreElements()) {
             entry = entries.nextElement();
             //构建压缩包中一个文件解压后保存的文件全路径
             entryFilePath = unzipFilePath + File.separator + entry.getName();
             //构建解压后保存的文件夹路径
             index = entryFilePath.lastIndexOf(File.separator);
-            if (index != -1)
-            {
+            if (index != -1) {
                 entryDirPath = entryFilePath.substring(0, index);
-            }
-            else
-            {
+            } else {
                 entryDirPath = "";
             }
             entryDir = new File(entryDirPath);
             //如果文件夹路径不存在，则创建文件夹
-            if (!entryDir.exists() || !entryDir.isDirectory())
-            {
+            if (!entryDir.exists() || !entryDir.isDirectory()) {
                 entryDir.mkdirs();
             }
 
             //创建解压文件
             entryFile = new File(entryFilePath);
-            if (entryFile.exists())
-            {
+            if (entryFile.exists()) {
                 //检测文件是否允许删除，如果不允许删除，将会抛出SecurityException
                 SecurityManager securityManager = new SecurityManager();
                 securityManager.checkDelete(entryFilePath);
@@ -172,8 +169,7 @@ public class DownloadTest {
             //写入文件
             bos = new BufferedOutputStream(new FileOutputStream(entryFile));
             bis = new BufferedInputStream(zip.getInputStream(entry));
-            while ((count = bis.read(buffer, 0, bufferSize)) != -1)
-            {
+            while ((count = bis.read(buffer, 0, bufferSize)) != -1) {
                 bos.write(buffer, 0, count);
             }
             bos.flush();

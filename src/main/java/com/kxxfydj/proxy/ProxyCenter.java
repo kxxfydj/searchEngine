@@ -1,48 +1,46 @@
 package com.kxxfydj.proxy;
 
+import com.kxxfydj.entity.Proxy;
+import com.kxxfydj.mapper.ProxyMapper;
+import com.kxxfydj.service.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Lazy(false)
 public class ProxyCenter {
 
-	@Value("#{settings['mode']}")
-	private String mode;
-	@Autowired
-	private DialADSLProxyCenter dialADSLProxyCenter;
+    private static Map<String, java.net.Proxy.Type> typeMap = new HashMap<>();
 
+    @Autowired
+    private ProxyService proxyService;
 
-	private static final Random ram = new Random();
+    static {
+        typeMap.put("http", java.net.Proxy.Type.HTTP);
+        typeMap.put("https", java.net.Proxy.Type.HTTP);
+        typeMap.put("socks", java.net.Proxy.Type.SOCKS);
+    }
 
-	private Map<Integer, ProxyWeight> proxyWeighttMap = new ConcurrentHashMap<>();
+    public synchronized java.net.Proxy availableProxy(List<Proxy> autoProxyList) {
+        int j = 0;
+        for(int i = 1; i < autoProxyList.size(); i++){
+            if(autoProxyList.get(i).getSpeed() < autoProxyList.get(j).getSpeed() && autoProxyList.get(j).isEnabled() && autoProxyList.get(i).isEnabled()){
+                j = i;
+            }
+        }
+        Proxy autoProxy = autoProxyList.get(j);
+        InetSocketAddress socketAddress = new InetSocketAddress(autoProxy.getIp(), autoProxy.getPort());
 
-	public synchronized AutoProxy availableProxy(int bankType, String clientIp) {
-		// 本地开发，不用代理，或者用特定代理
-		int proxyType;
-		if (!"dev".equals(mode)) {
-			AutoProxy autoProxy = null;
-			ProxyWeight proxyWeight = proxyWeighttMap.get(bankType);
-			if (proxyWeight != null) {
-				// 用随机数来区分百分比
-				proxyType = proxyWeight.judgeProxyType(ram.nextInt(100));
+        autoProxy.setUsedTimes(autoProxy.getUsedTimes() + 1);
+        proxyService.updateProxy(autoProxy);
 
-				if (ProxyType.DAIL_ADSL == proxyType) {
-					autoProxy = dialADSLProxyCenter.pop(clientIp);
-				} else {
-					autoProxy = null;
-				}
-			}
-			return autoProxy;
-		} else {
-			return null;
-		}
-	}
+        return new java.net.Proxy(typeMap.get(autoProxy.getType()),socketAddress);
+    }
 
 }

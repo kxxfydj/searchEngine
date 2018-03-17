@@ -1,4 +1,4 @@
-package com.kxxfydj.webmagicext;
+package com.kxxfydj.crawlerConfig;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;

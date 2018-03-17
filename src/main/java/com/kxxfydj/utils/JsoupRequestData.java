@@ -1,9 +1,14 @@
 package com.kxxfydj.utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import com.kxxfydj.entity.Proxy;
+import com.kxxfydj.proxy.ProxyCenter;
+import com.kxxfydj.redis.RedisUtil;
+import org.apache.http.HttpStatus;
+import org.springframework.web.context.ContextLoader;
+
+import java.net.InetSocketAddress;
+import java.util.*;
 
 /**
  * Created by kxxfydj on 2018/3/5.
@@ -29,9 +34,14 @@ public class JsoupRequestData {
     private Boolean isAutoRedirect = true;
 
     /**
-     *  是否开启返回响应头
+     * 是否开启返回响应头
      */
     private boolean isGetResponseHeaders = false;
+
+    /**
+     * 代理设置
+     */
+    private java.net.Proxy proxy;
 
     /**
      * 能接受的状态码
@@ -46,20 +56,59 @@ public class JsoupRequestData {
     private Object requestData;
 
 
+    public java.net.Proxy getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(java.net.Proxy proxy) {
+        this.proxy = proxy;
+    }
 
     public static int getDefaultTimeout() {
         return DEFAULT_TIMEOUT;
     }
 
+    public JsoupRequestData(){
+        initJsoupRequestData();
+    }
+
     public Map<String, String> getHeaders() {
-        if(headers == null){
+        if (headers == null) {
             headers = new HashMap<>();
-            headers.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0");
+            headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0");
         }
 
         return headers;
     }
 
+    private void initJsoupRequestData() {
+//        if(this.proxy == null){
+////            InetSocketAddress defaultSocket = new InetSocketAddress("127.0.0.1",)
+////            java.net.Proxy defaultProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP,)
+////            this.proxy =
+//        }
+
+        statusCodeSet = new HashSet<>();
+        statusCodeSet.add(HttpStatus.SC_OK);
+        statusCodeSet.add(HttpStatus.SC_MOVED_PERMANENTLY);
+        statusCodeSet.add(HttpStatus.SC_MOVED_TEMPORARILY);
+        statusCodeSet.add(HttpStatus.SC_SEE_OTHER);
+        statusCodeSet.add(HttpStatus.SC_TEMPORARY_REDIRECT);
+    }
+
+    public void setProxyFromRedis() {
+        if (ContextLoader.getCurrentWebApplicationContext() != null) {
+            ProxyCenter proxyCenter = ContextLoader.getCurrentWebApplicationContext().getBean(ProxyCenter.class);
+            RedisUtil<String, Proxy> redisTemplate = ContextLoader.getCurrentWebApplicationContext().getBean(RedisUtil.class);
+            List<Proxy> proxyList = redisTemplate.lGet("proxyList", 0, 99);
+            this.proxy = proxyCenter.availableProxy(proxyList);
+        }
+    }
+
+    public void setFiddlerProxy() {
+        InetSocketAddress fiddlerSocket = new InetSocketAddress("127.0.0.1",888 );
+        this.proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, fiddlerSocket);
+    }
 
 
     public void setHeaders(Map<String, String> headers) {
@@ -99,12 +148,6 @@ public class JsoupRequestData {
     }
 
     public Set<Integer> getStatusCodeSet() {
-        if(statusCodeSet == null){
-            statusCodeSet = new HashSet<>();
-            statusCodeSet.add(200);
-            statusCodeSet.add(300);
-            statusCodeSet.add(302);
-        }
         return statusCodeSet;
     }
 

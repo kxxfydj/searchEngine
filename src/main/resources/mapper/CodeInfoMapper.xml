@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kxxfydj.mapper.CodeInfoMapper">
+    <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeInfo">
+        <result column="projectName" jdbcType="VARCHAR" property="projectName"/>
+        <result column="repository" jdbcType="VARCHAR" property="repository"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="filePath" jdbcType="VARCHAR" property="filePath"/>
+        <result column="stars" jdbcType="INTEGER" property="stars"/>
+        <result column="gitPath" jdbcType="VARCHAR" property="gitPath"/>
+        <result column="repositoryId" jdbcType="INTEGER" property="repositoryId"/>
+    </resultMap>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into codeinfo(projectName,
+        repository,
+        language,
+        description,
+        filePath,
+        stars,
+        gitPath,
+        repositoryId) VALUES
+        <foreach collection="list" item="codeInfo" separator=",">
+            (
+            #{codeInfo.projectName,jdbcType=VARCHAR},
+            #{codeInfo.repository,jdbcType=VARCHAR},
+            #{codeInfo.language,jdbcType=VARCHAR},
+            #{codeInfo.description,jdbcType=VARCHAR},
+            #{codeInfo.filePath,jdbcType=VARCHAR},
+            #{codeInfo.stars,jdbcType=INTEGER},
+            #{codeInfo.gitPath,jdbcType=VARCHAR},
+            #{codeInfo.repositoryId,jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
+
+    <delete id="truncateTable">
+        truncate TABLE codeinfo;
+    </delete>
+
+    <delete id="deleteByProjectName">
+        DELETE from table codeinfo where projectName = #{projectName};
+    </delete>
+
+    <select id="selectAll" resultMap="baseResultMap">
+        select * from codeinfo;
+    </select>
+
+    <select id="selectByProjectName" resultMap="baseResultMap">
+        SELECT * from codeinfo where projectName = #{projectName}
+    </select>
+
+    <select id="selectByProjectNameAndLanguage" resultMap="baseResultMap">
+        SELECT * from codeinfo where projectName = #{projectName} AND language = #{language};
+    </select>
+
+    <select id="selectByGitPath" resultMap="baseResultMap">
+        SELECT * from codeinfo where gitPath = #{gitPath};
+    </select>
+</mapper>

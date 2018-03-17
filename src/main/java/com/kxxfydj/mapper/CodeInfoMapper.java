@@ -1,6 +1,7 @@
-package com.kxxfydj.dao;
+package com.kxxfydj.mapper;
 
 import com.kxxfydj.entity.CodeInfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,10 +12,10 @@ import java.util.List;
 @Repository
 public interface CodeInfoMapper {
     int batchInsert(List<CodeInfo> codeInfoListd);
-    int delete(String projectName);
+    int truncateTable();
+    int deleteByProjectName(String projectName);
     List<CodeInfo> selectAll();
     List<CodeInfo> selectByProjectName(String projectName);
-    List<CodeInfo> selectByProjectNameAndLanguage(String projectName,String language);
+    List<CodeInfo> selectByProjectNameAndLanguage(@Param("projectName") String projectName, @Param("language") String language);
     CodeInfo selectByGitPath(String gitPath);
-    int cleanTable();
 }

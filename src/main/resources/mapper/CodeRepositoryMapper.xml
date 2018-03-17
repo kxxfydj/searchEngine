@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kxxfydj.mapper.CodeRepositoryMapper">
+    <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeRepository">
+        <result column="repositoryName" jdbcType="VARCHAR" property="repositoryName"/>
+        <result column="projectCount" jdbcType="INTEGER" property="projectCount"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
+    </resultMap>
+
+    <select id="selectByName" resultMap="baseResultMap">
+        SELECT * from coderepository where repositoryName = #{repositoryName};
+    </select>
+
+    <insert id="insert" parameterType="com.kxxfydj.entity.CodeRepository">
+        INSERT INTO coderepository(repositoryName,projectCount,language) values (
+        #{repositoryName,jdbcType=VARCHAR},
+        #{projectCount,jdbcType=INTEGER},
+        #{language,jdbcType=VARCHAR}
+        );
+    </insert>
+
+    <select id="selectByNameAndLanguage" resultMap="baseResultMap">
+        select * from coderepository where repositoryName = #{repositoryName} and language = #{language};
+    </select>
+
+    <update id="updateCodeRepository" parameterType="com.kxxfydj.entity.CodeRepository">
+        UPDATE coderepository SET projectCount = #{projectCount} where repositoryName = #{repositoryName} and language = #{language};
+    </update>
+</mapper>

@@ -1,6 +1,5 @@
 package com.kxxfydj.crawlerConfig;
 
-import com.kxxfydj.webmagicext.MyHttpClientGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
@@ -13,13 +12,13 @@ import java.lang.reflect.Field;
 /**
  * create by kaiming_xu on 2017/9/3
  */
-public class MyHttpDownloader extends HttpClientDownloader {
+public class MyHttpClientDownloader extends HttpClientDownloader {
 
-    private static Logger logger = LoggerFactory.getLogger(MyHttpDownloader.class);
+    private static Logger logger = LoggerFactory.getLogger(MyHttpClientDownloader.class);
 
     private MyHttpClientGenerator httpClientGenerator;
 
-    public MyHttpDownloader() {
+    public MyHttpClientDownloader() {
         try {
             Field httpClientGeneratorField = HttpClientDownloader.class.getDeclaredField("httpClientGenerator");
             httpClientGeneratorField.setAccessible(true);

@@ -10,9 +10,16 @@ public abstract class CrawlerBase implements Crawler {
 
     protected CrawlerConfig crawlerConfig;
 
-    protected Site site = Site.me().
-            setDomain("github.com")
+    protected String language;
+
+    protected Site site = Site.me()
             .setSleepTime(0);
+
+    protected CrawlerBase(String language){
+        this.language = language;
+    }
+
+    protected CrawlerBase(){}
 
     @Override
     public void setCrawlerConfig(CrawlerConfig crawlerConfig) {

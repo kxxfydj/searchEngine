@@ -1,35 +1,24 @@
 package com.kxxfydj.common;
 
-import org.springframework.stereotype.Repository;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by kxxfydj on 2018/3/13.
  */
-public enum RepositoryEnum {
+public enum CrawlerTypeEnum {
     GITLAB("gitlab"),
     GITHUB("github");
 
-    private String repository;
+    private String type;
 
-    private static final Map<String,String> repositoryMap = new HashMap<>();
-
-    static {
-        repositoryMap.put("github",GITHUB.getRepository());
-        repositoryMap.put("gitlab",GITLAB.getRepository());
+    CrawlerTypeEnum(String value){
+        this.type = value;
     }
 
-    RepositoryEnum(String repository){
-        this.repository = repository;
+    public String getType(){
+        return this.type;
     }
 
-    private String getRepository(){
-        return this.repository;
-    }
-
-    public String getRepository(String crawlerType){
-        return repositoryMap.get(crawlerType);
+    @Override
+    public String toString() {
+        return this.type;
     }
 }

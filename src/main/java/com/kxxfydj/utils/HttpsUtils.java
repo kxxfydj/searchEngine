@@ -80,7 +80,6 @@ public class HttpsUtils {
             Connection connection = Jsoup
                     .connect(url)
                     .timeout(timeOut)
-
                     .userAgent(jsoupRequestData.getHeaders().get("User-Agent"));
 
             //set headers
@@ -92,6 +91,11 @@ public class HttpsUtils {
             if (cookies != null && !cookies.isEmpty()) {
                 //set cookies
                 connection = connection.cookies(cookies);
+            }
+
+            //set proxy
+            if(jsoupRequestData.getProxy() != null){
+                connection = connection.proxy(jsoupRequestData.getProxy());
             }
 
             if(HttpsUtils.GET.equals(method)){
@@ -130,6 +134,16 @@ public class HttpsUtils {
         }
         return null;
     }
+
+//    private Connection handlerRedirection(Connection.Response response){
+//        int statusCode = response.statusCode();
+//        if(300 <=statusCode && statusCode < 400){
+//            Map<String,String> headers = response.headers();
+//            String location = headers.get("Location");
+//
+//            return
+//        }
+//    }
 
     private static String getHtmlFromRequest(Connection connection, JsoupRequestData jsoupRequestData) {
         try {

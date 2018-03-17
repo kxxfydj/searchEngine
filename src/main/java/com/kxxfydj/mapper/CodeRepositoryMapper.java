@@ -1,7 +1,16 @@
 package com.kxxfydj.mapper;
 
+import com.kxxfydj.entity.CodeRepository;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
 /**
  * Created by kxxfydj on 2018/3/10.
  */
 public interface CodeRepositoryMapper {
+    List<CodeRepository> selectByName(String repositoryName);
+    CodeRepository selectByNameAndLanguage(@Param("repositoryName") String repositoryName, @Param("language") String language);
+    void insert(CodeRepository codeRepository);
+    int updateCodeRepository(CodeRepository codeRepository);
 }

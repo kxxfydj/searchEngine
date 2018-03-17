@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kxxfydj.mapper.ProxyMapper">
+    <resultMap id="baseResultMap" type="com.kxxfydj.entity.Proxy">
+        <id column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="port" jdbcType="INTEGER" property="port"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="speed" jdbcType="BIGINT" property="speed"/>
+        <result column="usedTimes" jdbcType="INTEGER" property="usedTimes"/>
+        <result column="enabled" jdbcType="TINYINT" property="enabled"/>
+
+    </resultMap>
+
+    <insert id="saveOrUpdate" parameterType="java.util.List">
+        INSERT INTO proxy(ip,port,type,speed,usedTimes,enabled) values
+        <foreach collection="list" item="proxy" separator=",">
+            (
+            #{proxy.ip,jdbcType=VARCHAR},
+            #{proxy.port,jdbcType=INTEGER},
+            #{proxy.type,jdbcType=VARCHAR},
+            #{proxy.speed,jdbcType=BIGINT},
+            #{proxy.usedTimes,jdbcType=INTEGER},
+            #{proxy.enabled,jdbcType=TINYINT}
+            )
+        </foreach>
+      on DUPLICATE KEY UPDATE
+        <!--<trim prefix="speed =case" suffix="end,">-->
+            <!--<foreach collection="list" item="proxy">-->
+                <!--<if test="proxy.speed!=null">-->
+                    <!--when id=#{proxy.id} then #{proxy.speed}-->
+                <!--</if>-->
+            <!--</foreach>-->
+        <!--</trim>-->
+        <!--<trim prefix="usedTimes =case" suffix="end,">-->
+            <!--<foreach collection="list" item="proxy">-->
+                <!--<if test="proxy.usedTimes!=null">-->
+                    <!--when id=#{proxy.id} then #{proxy.usedTimes}-->
+                <!--</if>-->
+            <!--</foreach>-->
+        <!--</trim>-->
+        <trim prefix="enabled =case" suffix="end">
+            <foreach collection="list" item="proxy">
+                <if test="proxy.enabled!=null">
+                    when ip=#{proxy.ip} then #{proxy.enabled}
+                </if>
+            </foreach>
+        </trim>
+    </insert>
+
+    <select id="selectEnabled" resultMap="baseResultMap">
+        select * from proxy where enabled = 1;
+    </select>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        update proxy
+        <trim prefix="set" suffixOverrides=",">
+
+            <!-- 拼接case when  -->
+            <!--<trim prefix="ip =case" suffix="end,">-->
+                <!--<foreach collection="list" item="proxy">-->
+                    <!--<if test="proxy.ip!=null">-->
+                        <!--when ip=#{proxy.ip} then #{proxy.ip}-->
+                    <!--</if>-->
+                <!--</foreach>-->
+            <!--</trim>-->
+            <trim prefix="port =case" suffix="end,">
+                <foreach collection="list" item="proxy">
+                    <if test="proxy.port!=null">
+                        when ip=#{proxy.ip} then #{proxy.port}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="type =case" suffix="end,">
+                <foreach collection="list" item="proxy">
+                    <if test="proxy.type!=null">
+                        when ip=#{proxy.ip} then #{proxy.type}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="speed =case" suffix="end,">
+                <foreach collection="list" item="proxy">
+                    <if test="proxy.speed!=null">
+                        when ip=#{proxy.ip} then #{proxy.speed}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="usedTimes =case" suffix="end,">
+                <foreach collection="list" item="proxy">
+                    <if test="proxy.usedTimes!=null">
+                        when ip=#{proxy.ip} then #{proxy.usedTimes}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="enabled =case" suffix="end,">
+                <foreach collection="list" item="proxy">
+                    <if test="proxy.enabled!=null">
+                        when ip=#{proxy.ip} then #{proxy.enabled}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        <where>
+            ip in (
+            <foreach collection="list" separator="," item="proxy">
+                #{proxy.ip}
+            </foreach>
+            )
+        </where>
+    </update>
+
+    <update id="update" parameterType="com.kxxfydj.entity.Proxy" >
+        UPDATE proxy SET usedTimes = #{usedTimes},enabled = #{enabled} WHERE ip = #{ip};
+    </update>
+
+</mapper>

@@ -43,7 +43,7 @@ public class MyThreadPoolExecutor extends ThreadPoolExecutor {
 
 		super.afterExecute(runnable, throwable);
 		//线程使用完后把MDC及ThreadContext清理掉，防止下次使用时出现赃数据
-		MDC.clear();
+//		MDC.clear();
 		ThreadContext.clear();
 	}
 }

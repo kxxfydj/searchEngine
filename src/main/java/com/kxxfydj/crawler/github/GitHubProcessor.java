@@ -1,143 +1,132 @@
-package com.kxxfydj.crawler.ziruwang;
+package com.kxxfydj.crawler.github;
 
 import com.kxxfydj.common.CommonTag;
+import com.kxxfydj.common.CrawlerTypeEnum;
+import com.kxxfydj.common.PipelineKeys;
+import com.kxxfydj.entity.CodeInfo;
+import com.kxxfydj.utils.*;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * create by kaiming_xu on 2017/9/2
  */
-public class GitHubProcessor implements PageProcessor{
+public class GitHubProcessor implements PageProcessor {
+
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    String PROJECT_PATH = System.getProperty("user.dir");
 
     private static Logger logger = LoggerFactory.getLogger(GitHubProcessor.class);
 
     private Site site;
-//
-//    private List<House> houseList = Collections.synchronizedList(new ArrayList<>());
-//
-//    private AtomicInteger pageCount = new AtomicInteger(0);
-//
-    public GitHubProcessor(Site site) {
+
+    private String language;
+
+    private List<CodeInfo> codeInfoList = new ArrayList<>();
+
+    private AtomicInteger pageCount = new AtomicInteger(0);
+
+    private AtomicLong totalCount = new AtomicLong(0L);
+
+    private AtomicLong handleredCount = new AtomicLong(0L);
+
+    public GitHubProcessor(Site site, String language) {
         this.site = site;
+        this.language = language;
     }
-//
+
     @Override
     public void process(Page page) {
         String type = (String) page.getRequest().getExtra(CommonTag.TYPE);
 
-        if(CommonTag.HOME_PAGE.equals(type)){
-            processHomePage(page);
-        }else if(CommonTag.REGION_PAGE.equals(type)){
-            processRegionPage(page);
+        if (CommonTag.FIRST_PAGE.equals(type)) {
+            processFirstPage(page);
+        } else if (CommonTag.NEXT_PAGE.equals(type)) {
+            processNextPage(page);
         }
     }
-//
-//
-    private void processHomePage(Page page){
+
+    private void processFirstPage(Page page) {
         Document document = page.getHtml().getDocument();
-//        Elements lis = document.select("#selection > div > div > dl.clearfix.zIndex6 > dd > ul > li");
-//        lis.remove(0);
-//
-//        for(Element li : lis){
-//            String targetUrl = "http:" + li.child(0).getElementsByTag("a").attr("href");
-//            Request request = RequestUtil.createGetRequest(targetUrl,CommonTag.REGION_PAGE);
-//            request.putExtra("isFirstPage",true);
-//            pageCount.incrementAndGet();
+        Elements repoList = document.select("#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > ul > div");
+        for (Element repo : repoList) {
+            Element codeLinkTag = repo.getElementsByTag("a").first();
+            String codeLink = codeLinkTag.attr("href");
+            Request request = RequestUtil.createGetRequest(codeLink, CommonTag.NEXT_PAGE);
+            request.putExtra("referer", page.getRequest().getUrl());
+            totalCount.incrementAndGet();
+            page.addTargetRequest(request);
+        }
+        Element nextPage = document.selectFirst("#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > div.paginate-container > div > a.next_page");
+        String nextUrl = nextPage.attr("href");
+        pageCount.incrementAndGet();
+//        if(StringUtils.isNotBlank(nextUrl)){
+//            Request request = RequestUtil.createGetRequest(nextUrl,CommonTag.FIRST_PAGE);
 //            page.addTargetRequest(request);
-//        }
+//        }else
+        if (totalCount == handleredCount) {
+            page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
+            page.putField(PipelineKeys.LANGUAGE, this.language);
+            page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
+            page.putField(PipelineKeys.FINISHED, true);
+        }
     }
-//
-//    /**
-//     *
-//     * @param page
-//     */
-    private void processRegionPage(Page page){
-//        Document document = page.getHtml().getDocument();
-//        Elements homeNodes = document.select("#houseList").get(0).children();
-//
-//        Boolean isFirstPage = (Boolean) page.getRequest().getExtra("isFirstPage");
-//        if(isFirstPage != null){
-//            String firstUrl = document.select("#page > .active").attr("href");
-//            String preffixUrl = "http:" + firstUrl.substring(0,firstUrl.length() - 1);
-//            int totalPage = Integer.parseInt(RegexUtils.singleExtract(document.select("#page > span").text(),"共(\\d+)页",1));
-//            for(int i = 2 ;i < totalPage ;i++){
-//                pageCount.incrementAndGet();
-//                Request request = RequestUtil.createGetRequest(preffixUrl + i,CommonTag.REGION_PAGE);
-//                page.addTargetRequest(request);
-//            }
-//        }
-//
-//        for(Element houseNode : homeNodes){
-//            House house = processImageUrl(houseNode);
-//            processHouseText(houseNode,house);
-//            processPriceDetail(houseNode,house);
-//            this.houseList.add(house);
-//        }
-//
-//        if(pageCount.decrementAndGet() == 0){
-//            page.putField(CommonTag.HOUSE_LIST,this.houseList);
-//            page.putField(CommonTag.FINISHED,true);
-//        }
-//
+
+    /**
+     * @param page
+     */
+    private void processNextPage(Page page) {
+        String referer = (String) page.getRequest().getExtra("referer");
+        Document document = page.getHtml().getDocument();
+        String projectName = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
+        String language = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > strong > a").first().text();
+        String description = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.js-repo-meta-container > div.repository-meta.mb-0.js-repo-meta-edit.js-details-container > div > span").first().text();
+        int stars = NumberFormatUtil.formatInt(document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > ul > li:nth-child(2) > a.social-count.js-social-count").text());
+        String gitPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.clone-options.https-clone-options > div > input").first().attr("value");
+        String downloadPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.mt-2 > a").first().attr("href");
+
+        CodeInfo codeInfo = new CodeInfo();
+        codeInfo.setDescription(description);
+        codeInfo.setLanguage(language);
+        codeInfo.setProjectName(projectName);
+        codeInfo.setStars(stars);
+        codeInfo.setRepository("github");
+        codeInfo.setGitPath(gitPath);
+
+        codeInfoList.add(codeInfo);
+        handleredCount.incrementAndGet();
+        downloadZip(language, projectName, downloadPath, referer);
     }
-//
-//    private House processImageUrl(Element element){
-//        String imageUrl = "http:" + element.select(".img.pr").first().getElementsByTag("img").attr("src");
-//        House house = new House();
-//        house.setImageUrl(imageUrl);
-//        return house;
-//    }
-//
-//    /**
-//     *
-//     * @param element
-//     * @return
-//     */
-//    private House processHouseText(Element element,House house){
-//        String detailLocation = element.select(".txt > h3").text();
-//        String locationInfo = element.select(".txt > h4").text();
-//        String region = RegexUtils.singleExtract(locationInfo,"\\[(.*?区)",1);
-//        String location = RegexUtils.singleExtract(locationInfo,".*区(.*?)]",1);
-//        String subwayNo = RegexUtils.singleExtract(locationInfo,"(\\d.{2}(\\(.*\\))?)(.*)",1);
-//        String subwayName = RegexUtils.singleExtract(locationInfo,"(\\d.{2}(\\(.*\\))?)(.*)",3);
-//
-//        Elements detailHouse = element.select(".txt > .detail > p > span");
-//        String area = RegexUtils.singleExtract(detailHouse.get(0).text(),"(\\d*(\\.\\d*)?)",0);
-//        String houseHight = detailHouse.get(1).text();
-//        String houseLayout = detailHouse.get(2).text();
-//        String howfar = detailHouse.get(4).text();
-//
-//        if(StringUtils.isNotBlank(detailLocation)) {
-//            house.setDetailLocation(detailLocation);
-//        }
-//        if(StringUtils.isNotBlank(area)) {
-//            house.setArea(Double.parseDouble(area));
-//        }
-//        house.setRegion(region);
-//        house.setLocation(location);
-//        house.setSubwayNo(subwayNo);
-//        house.setSubwayName(subwayName);
-//        house.setHouseHight(houseHight);
-//        house.setHouseLayout(houseLayout);
-//        house.setHowfar(howfar);
-//        return house;
-//    }
-//
-//    /**
-//     *
-//     * @param element
-//     * @param house
-//     */
-//    private void processPriceDetail(Element element,House house){
-//        String price = RegexUtils.singleExtract(element.select(".priceDetail > .price").text(),".*?(\\d+).*",1);
-//        String detailUrl = "http:" + element.select(".priceDetail > .more > a").attr("href");
-//        house.setPrice(Integer.parseInt(price));
-//        house.setDetailInfoUrl(detailUrl);
-//    }
+
+    private void downloadZip(String language, String projectName, String downloadPath, String referer) {
+        downloadPath = downloadPath.replaceAll("archive", "zip");
+        downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
+        downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
+        String filePath = PROJECT_PATH + FILE_SEPARATOR + "github" + FILE_SEPARATOR + language + FILE_SEPARATOR + projectName;
+//        File file = new File(filePath);
+        Map<String, String> requestHeaderMap;
+        requestHeaderMap = HeaderUtils.initGetHeaders("codeload.github.com", referer, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
+        JsoupRequestData jsoupRequestData = new JsoupRequestData();
+        jsoupRequestData.setHeaders(requestHeaderMap);
+//            apacheHttpRequestData.setFiddlerProxy();
+        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+        CreateFileUtil.generateFile(filePath, binaryData);
+    }
 
     @Override
     public Site getSite() {

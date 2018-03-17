@@ -9,7 +9,7 @@
         http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-        <context:property-placeholder location="classpath:db-config.properties" />
+        <context:property-placeholder location="classpath:db-config.properties" ignore-unresolvable="true"/>
 
         <!-- 配置mybatis的一些参数 -->
         <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
@@ -55,7 +55,7 @@
                 <!-- 扫描xml文件 -->
                 <property name="mapperLocations" value="classpath:/mapper/*.xml" />
                 <!-- 扫描配置文件 -->
-                <property name="configLocation" value="classpath:/mybatis/mybatis.xml" />
+                <property name="configLocation" value="classpath:/mybatis.xml" />
         </bean>
 
         <!-- 得到操作数据的模板 -->
@@ -65,7 +65,7 @@
 
         <!-- Mapper接口所在包名 -->
         <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-                <property name="basePackage" value="com.kaikai.mapper" />
+                <property name="basePackage" value="com.kxxfydj.mapper" />
                 <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
         </bean>
 

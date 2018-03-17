@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,10 +99,13 @@ public class Worker {
             //扫描指定包下的crawler任务,然后加入线程池任务队列
             List<Class<?>> clazzList = scanPackage(crawlerConfig.getSupportCrawlersPackages());
             for(Class<?> clazz : clazzList) {
+//                Constructor<?> constructor = clazz.getConstructor(String.class);
+//                Crawler crawler = (Crawler) constructor.newInstance("java");
                 Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
                 crawler.setCrawlerConfig(crawlerConfig);
                 queue.add(crawler);
             }
+//            | InvocationTargetException | NoSuchMethodException e
         }catch (InstantiationException | IllegalAccessException e) {
             logger.error("class新建对象失败! message:{}",e.getMessage());
         } catch (IOException e){

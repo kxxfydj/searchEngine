@@ -1,9 +1,9 @@
-package com.kxxfydj.proxy;
+package com.kxxfydj.entity;
 
 /**
  * Created by kxxfydj on 2018/3/14.
  */
-public class AutoProxy {
+public class Proxy {
 
     private String ip;
 
@@ -14,6 +14,16 @@ public class AutoProxy {
     private long speed;
 
     private int usedTimes;
+
+    private boolean enabled;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public int getUsedTimes() {
         return usedTimes;
@@ -60,7 +70,7 @@ public class AutoProxy {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AutoProxy autoProxy = (AutoProxy) o;
+        Proxy autoProxy = (Proxy) o;
 
         if (port != autoProxy.port) return false;
         if (ip != null ? !ip.equals(autoProxy.ip) : autoProxy.ip != null) return false;

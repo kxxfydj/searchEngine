@@ -1,4 +1,4 @@
-package com.kxxfydj.service.serviceImp;
+package com.kxxfydj.service.impl;
 
 import com.kxxfydj.mapper.CodeInfoMapper;
 import com.kxxfydj.entity.CodeInfo;
