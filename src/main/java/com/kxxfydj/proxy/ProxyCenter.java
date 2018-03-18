@@ -24,7 +24,7 @@ public class ProxyCenter {
     static {
         typeMap.put("http", java.net.Proxy.Type.HTTP);
         typeMap.put("https", java.net.Proxy.Type.HTTP);
-        typeMap.put("socks", java.net.Proxy.Type.SOCKS);
+        typeMap.put("socks4/5", java.net.Proxy.Type.SOCKS);
     }
 
     public synchronized java.net.Proxy availableProxy(List<Proxy> autoProxyList) {

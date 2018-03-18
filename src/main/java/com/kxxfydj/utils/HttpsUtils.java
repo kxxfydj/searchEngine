@@ -13,8 +13,10 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by kxxfydj on 2018/3/5.
@@ -94,22 +96,22 @@ public class HttpsUtils {
             }
 
             //set proxy
-            if(jsoupRequestData.getProxy() != null){
+            if (jsoupRequestData.getProxy() != null) {
                 connection = connection.proxy(jsoupRequestData.getProxy());
             }
 
-            if(HttpsUtils.GET.equals(method)){
-                connection = connection.method(Connection.Method.GET );
-            }else if(HttpsUtils.POST.equals(method)){
+            if (HttpsUtils.GET.equals(method)) {
+                connection = connection.method(Connection.Method.GET);
+            } else if (HttpsUtils.POST.equals(method)) {
                 connection = connection.method(Connection.Method.POST);
-                if(jsoupRequestData.getRequestData() instanceof String){
-                    connection = connection.requestBody((String)jsoupRequestData.getRequestData());
-                }else if(jsoupRequestData.getRequestData() instanceof Map){
-                    connection = connection.data((Map<String,String>) jsoupRequestData.getRequestData());
-                }else {
+                if (jsoupRequestData.getRequestData() instanceof String) {
+                    connection = connection.requestBody((String) jsoupRequestData.getRequestData());
+                } else if (jsoupRequestData.getRequestData() instanceof Map) {
+                    connection = connection.data((Map<String, String>) jsoupRequestData.getRequestData());
+                } else {
                     throw new RuntimeException("the request data format is not supported");
                 }
-            }else{
+            } else {
                 throw new RuntimeException("the request method is not supported");
             }
 
@@ -128,22 +130,18 @@ public class HttpsUtils {
                 throw new ResponseStatusException("the response status code is not accepted! code: " + statusCode);
             }
 
+            //handler the redirection
+            Connection rediConnection = handlerRedirection(connection,response);
+            if(rediConnection != null){
+                return getBytesFromRequest(rediConnection,jsoupRequestData);
+            }
+
             return IOUtils.toByteArray(response.bodyStream());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         return null;
     }
-
-//    private Connection handlerRedirection(Connection.Response response){
-//        int statusCode = response.statusCode();
-//        if(300 <=statusCode && statusCode < 400){
-//            Map<String,String> headers = response.headers();
-//            String location = headers.get("Location");
-//
-//            return
-//        }
-//    }
 
     private static String getHtmlFromRequest(Connection connection, JsoupRequestData jsoupRequestData) {
         try {
@@ -153,15 +151,15 @@ public class HttpsUtils {
                 throw new ResponseStatusException("the response status code is not accepted! code: " + statusCode);
             }
 
+            //handler the redirection
+            Connection rediConnection = handlerRedirection(connection,response);
+            if(rediConnection != null){
+                return getHtmlFromRequest(rediConnection,jsoupRequestData);
+            }
+
             String result = response.body();
             if (jsoupRequestData.isGetResponseHeaders()) {
-                HashSetValuedHashMap<String, String> headers = new HashSetValuedHashMap<>();
-                for (Map.Entry<String, List<String>> entry : response.multiHeaders().entrySet()) {
-                    for (String value : entry.getValue()) {
-                        headers.put(entry.getKey(), value);
-                    }
-                }
-
+                HashSetValuedHashMap<String, String> headers = handlerResponseHeader(response);
                 result = headers + "\n" + response.body();
             }
 
@@ -180,12 +178,81 @@ public class HttpsUtils {
                 throw new ResponseStatusException("the response status code is not accepted! code: " + statusCode);
             }
 
+            //handler the redirection
+            Connection rediConnection = handlerRedirection(connection,response);
+            if(rediConnection != null){
+                return getDocumentFromRequest(rediConnection,jsoupRequestData);
+            }
+
             return response.parse();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         return null;
     }
+
+    private static Connection handlerRedirection(Connection connection, Connection.Response response) {
+        int statusCode = response.statusCode();
+        if (300 <= statusCode && statusCode < 400) {
+            //get the response's multiHeaders,the Set-Cookie key may map multi value
+            HashSetValuedHashMap<String, String> headers = handlerResponseHeader(response);
+            Set<String> setCookies = headers.get("Set-Cookie");
+
+            //get the response's location value
+            Map<String, String> headersNotMulti = response.headers();
+            String location = headersNotMulti.get("Location");
+
+            //get the origin header,the redirection request is get type request,reConstruct the get request
+            String originHost = connection.request().header("Host");
+            String oringinReferer = connection.request().header("Referer");
+            String oringinUserAgent = connection.request().header("User-Agent");
+            Map<String,String> rediRequestHeaders = HeaderUtils.initGetHeaders(originHost,oringinReferer,oringinUserAgent);
+            Connection rediConnection = Jsoup.connect(location).method(Connection.Method.GET)
+                    .headers(rediRequestHeaders);
+
+            //headler the SetCookie,put the value to the redirectionRequest's cookie
+            Map<String,String> cookieMap = new HashMap<>();
+            for (String cookie : setCookies) {
+                String[] cookies = cookie.split(";");
+                handlerSetCookies(cookies,cookieMap);
+            }
+            rediConnection = rediConnection.cookies(cookieMap);
+            return rediConnection;
+        }
+        return null;
+    }
+
+    private static void handlerSetCookies(String[] cookies, Map<String, String> cookieMap) {
+        for (String cookie : cookies) {
+            String name = cookie.split("=")[0];
+            String value = cookie.split("=")[1];
+            switch (name) {
+                case "Expires":
+                case "Max-Age":
+                case "Domain":
+                case "Path":
+                case "Secure":
+                case "HttpOnly":
+                case "SameSite":
+                    break;
+                default:
+                    cookieMap.put(name, value);
+                    break;
+            }
+        }
+    }
+
+    private static HashSetValuedHashMap<String,String> handlerResponseHeader(Connection.Response response) {
+        HashSetValuedHashMap<String, String> headers = new HashSetValuedHashMap<>();
+        for (Map.Entry<String, List<String>> entry : response.multiHeaders().entrySet()) {
+            for (String value : entry.getValue()) {
+                headers.put(entry.getKey(), value);
+            }
+        }
+        return headers;
+    }
+
+
 
 
 }
