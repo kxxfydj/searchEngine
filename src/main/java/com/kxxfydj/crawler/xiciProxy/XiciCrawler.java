@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by kxxfydj on 2018/3/16.
  */
-@Crawl
+//@Crawl
 public class XiciCrawler extends CrawlerBase {
     @Override
     public void run() {

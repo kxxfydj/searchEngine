@@ -106,7 +106,7 @@ public class JsoupRequestData {
     }
 
     public void setFiddlerProxy() {
-        InetSocketAddress fiddlerSocket = new InetSocketAddress("127.0.0.1",888 );
+        InetSocketAddress fiddlerSocket = new InetSocketAddress("127.0.0.1",8888 );
         this.proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, fiddlerSocket);
     }
 

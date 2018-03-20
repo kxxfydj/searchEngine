@@ -396,6 +396,21 @@ public class RedisUtil<K,V> {
     }
 
     /**
+     * list 的Left pop操作
+     * @param key list的键
+     * @return
+     */
+    public V lLeftPop(K key){
+        ListOperations<K,V> operations = redisTemplate.opsForList();
+        return operations.leftPop(key);
+    }
+
+    public V lRightPop(K key){
+        ListOperations<K,V> operations = redisTemplate.opsForList();
+        return operations.rightPop(key);
+    }
+
+    /**
      * 获取list缓存的长度
      * @param key 键
      * @return

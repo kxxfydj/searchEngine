@@ -24,20 +24,20 @@
             )
         </foreach>
       on DUPLICATE KEY UPDATE
-        <!--<trim prefix="speed =case" suffix="end,">-->
-            <!--<foreach collection="list" item="proxy">-->
-                <!--<if test="proxy.speed!=null">-->
-                    <!--when id=#{proxy.id} then #{proxy.speed}-->
-                <!--</if>-->
-            <!--</foreach>-->
-        <!--</trim>-->
-        <!--<trim prefix="usedTimes =case" suffix="end,">-->
-            <!--<foreach collection="list" item="proxy">-->
-                <!--<if test="proxy.usedTimes!=null">-->
-                    <!--when id=#{proxy.id} then #{proxy.usedTimes}-->
-                <!--</if>-->
-            <!--</foreach>-->
-        <!--</trim>-->
+        <trim prefix="speed =case" suffix="end,">
+            <foreach collection="list" item="proxy">
+                <if test="proxy.speed!=null">
+                    when id=#{proxy.id} then #{proxy.speed}
+                </if>
+            </foreach>
+        </trim>
+        <trim prefix="usedTimes =case" suffix="end,">
+            <foreach collection="list" item="proxy">
+                <if test="proxy.usedTimes!=null">
+                    when id=#{proxy.id} then #{proxy.usedTimes}
+                </if>
+            </foreach>
+        </trim>
         <trim prefix="enabled =case" suffix="end">
             <foreach collection="list" item="proxy">
                 <if test="proxy.enabled!=null">
@@ -109,7 +109,7 @@
     </update>
 
     <update id="update" parameterType="com.kxxfydj.entity.Proxy" >
-        UPDATE proxy SET usedTimes = #{usedTimes},enabled = #{enabled} WHERE ip = #{ip};
+        UPDATE proxy SET speed = #{speed}, usedTimes = #{usedTimes}, enabled = #{enabled} WHERE ip = #{ip};
     </update>
 
 </mapper>

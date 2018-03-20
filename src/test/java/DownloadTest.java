@@ -1,4 +1,7 @@
+import com.kxxfydj.utils.CreateFileUtil;
 import com.kxxfydj.utils.HeaderUtils;
+import com.kxxfydj.utils.HttpsUtils;
+import com.kxxfydj.utils.JsoupRequestData;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,6 +34,16 @@ public class DownloadTest {
 
     private static Map<String, String> requestHeaderMap;
 
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
+    String PROJECT_PATH = "D:\\codeSource";
+
+    private static final String HOST = "codeload.github.com";
+
+    private static final String REFERER = "https://github.com";
+
+    private static final String USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
+
     static {
         requestHeaderMap = HeaderUtils.initPostHeaders("github.com",
                 "https://github.com/",
@@ -53,7 +66,25 @@ public class DownloadTest {
 //        }catch (Exception e){
 //            logger.error(e.getMessage(),e);
 //        }
-        System.out.println(System.getProperty("user.dir"));
+//        System.out.println(System.getProperty("user.dir"));
+        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
+    }
+
+    private void downloadZip(String language, String projectName, String downloadPath) {
+        downloadPath = downloadPath.replaceAll("archive", "zip");
+        downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
+        downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
+        String filePath = PROJECT_PATH + FILE_SEPARATOR + "github" + FILE_SEPARATOR + language + FILE_SEPARATOR + projectName + ".zip";
+//        File file = new File(filePath);
+
+        Map<String, String> requestHeaderMap;
+        requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
+        JsoupRequestData jsoupRequestData = new JsoupRequestData();
+        jsoupRequestData.setFiddlerProxy();
+        jsoupRequestData.setHeaders(requestHeaderMap);
+//            apacheHttpRequestData.setFiddlerProxy();
+        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+        CreateFileUtil.generateFile(filePath, binaryData);
     }
 
     @Test
@@ -80,22 +111,24 @@ public class DownloadTest {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             // Fetch url
-            String url = "https://github.com/search?utf8=%E2%9C%93&q=java&type=";
+            String url = "https://codeload.github.com/TheAlgorithms/Java/zip/master";
 
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8888));
+            Map<String,String> header = HeaderUtils.initGetHeaders("codeload.github.com","https://github.com","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
+
             Connection.Response response = Jsoup //
                     .connect(url) //
                     .timeout(60000) //
                     .method(Connection.Method.GET) //
+                    .headers(header)
+                    .ignoreContentType(true)
                     .proxy(proxy)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0") //
-                    .header("Host", "github.com")
-                    .header("Referer", "https://github.com/")
                     .execute();
 
 
-            Document document = response.parse();
-            System.out.println(document);
+//            Document document = response.parse();
+            byte[] data = response.bodyAsBytes();
+            System.out.println("");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -81,14 +81,11 @@ public class HttpsUtils {
 
             Connection connection = Jsoup
                     .connect(url)
-                    .timeout(timeOut)
-                    .userAgent(jsoupRequestData.getHeaders().get("User-Agent"));
+                    .timeout(timeOut);
 
             //set headers
             Map<String, String> headers = jsoupRequestData.getHeaders();
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                connection = connection.header(entry.getKey(), entry.getValue());
-            }
+            connection = connection.headers(headers);
 
             if (cookies != null && !cookies.isEmpty()) {
                 //set cookies
@@ -124,7 +121,7 @@ public class HttpsUtils {
 
     private static byte[] getBytesFromRequest(Connection connection, JsoupRequestData jsoupRequestData) {
         try {
-            Connection.Response response = connection.execute();
+            Connection.Response response = connection.ignoreContentType(true).execute();
             int statusCode = response.statusCode();
             if (!jsoupRequestData.getStatusCodeSet().contains(statusCode)) {
                 throw new ResponseStatusException("the response status code is not accepted! code: " + statusCode);
@@ -136,7 +133,7 @@ public class HttpsUtils {
                 return getBytesFromRequest(rediConnection,jsoupRequestData);
             }
 
-            return IOUtils.toByteArray(response.bodyStream());
+            return response.bodyAsBytes();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -227,13 +224,13 @@ public class HttpsUtils {
             String name = cookie.split("=")[0];
             String value = cookie.split("=")[1];
             switch (name) {
-                case "Expires":
-                case "Max-Age":
-                case "Domain":
-                case "Path":
-                case "Secure":
-                case "HttpOnly":
-                case "SameSite":
+                case "expires":
+                case "max-Age":
+                case "domain":
+                case "path":
+                case "secure":
+                case "httpOnly":
+                case "sameSite":
                     break;
                 default:
                     cookieMap.put(name, value);

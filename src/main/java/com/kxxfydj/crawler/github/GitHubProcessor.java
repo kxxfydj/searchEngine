@@ -15,8 +15,6 @@ import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,14 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GitHubProcessor implements PageProcessor {
 
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
     String PROJECT_PATH = System.getProperty("user.dir");
+
+    private static final String HOST = "codeload.github.com";
+
+    private static final String REFERER = "https://github.com";
+
+    private static final String USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
 
     private static Logger logger = LoggerFactory.getLogger(GitHubProcessor.class);
 
@@ -68,7 +73,6 @@ public class GitHubProcessor implements PageProcessor {
             Element codeLinkTag = repo.getElementsByTag("a").first();
             String codeLink = codeLinkTag.attr("href");
             Request request = RequestUtil.createGetRequest(codeLink, CommonTag.NEXT_PAGE);
-            request.putExtra("referer", page.getRequest().getUrl());
             totalCount.incrementAndGet();
             page.addTargetRequest(request);
         }
@@ -91,7 +95,6 @@ public class GitHubProcessor implements PageProcessor {
      * @param page
      */
     private void processNextPage(Page page) {
-        String referer = (String) page.getRequest().getExtra("referer");
         Document document = page.getHtml().getDocument();
         String projectName = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
         String language = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > strong > a").first().text();
@@ -110,20 +113,24 @@ public class GitHubProcessor implements PageProcessor {
 
         codeInfoList.add(codeInfo);
         handleredCount.incrementAndGet();
-        downloadZip(language, projectName, downloadPath, referer);
+        downloadZip(language, projectName, downloadPath);
     }
 
-    private void downloadZip(String language, String projectName, String downloadPath, String referer) {
+    private void downloadZip(String language, String projectName, String downloadPath) {
         downloadPath = downloadPath.replaceAll("archive", "zip");
         downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
         downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
         String filePath = PROJECT_PATH + FILE_SEPARATOR + "github" + FILE_SEPARATOR + language + FILE_SEPARATOR + projectName;
 //        File file = new File(filePath);
+
         Map<String, String> requestHeaderMap;
-        requestHeaderMap = HeaderUtils.initGetHeaders("codeload.github.com", referer, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
+        requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
+        jsoupRequestData.setProxyFromRedis();
         jsoupRequestData.setHeaders(requestHeaderMap);
 //            apacheHttpRequestData.setFiddlerProxy();
+
+        logger.info("downloading file {}", downloadPath);
         byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
         CreateFileUtil.generateFile(filePath, binaryData);
     }

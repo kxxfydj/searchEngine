@@ -3,7 +3,14 @@ package com.kxxfydj.entity;
 /**
  * Created by kxxfydj on 2018/3/14.
  */
-public class Proxy {
+public class Proxy implements Comparable{
+
+    public Proxy(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public Proxy(){}
 
     private String ip;
 
@@ -65,24 +72,20 @@ public class Proxy {
         this.speed = speed;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Proxy autoProxy = (Proxy) o;
+        Proxy proxy = (Proxy) o;
 
-        if (port != autoProxy.port) return false;
-        if (ip != null ? !ip.equals(autoProxy.ip) : autoProxy.ip != null) return false;
-        return type != null ? type.equals(autoProxy.type) : autoProxy.type == null;
+        return ip != null ? ip.equals(proxy.ip) : proxy.ip == null;
     }
 
     @Override
     public int hashCode() {
-        int result = ip != null ? ip.hashCode() : 0;
-        result = 31 * result + port;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        return result;
+        return ip != null ? ip.hashCode() : 0;
     }
 
     @Override
@@ -92,5 +95,17 @@ public class Proxy {
                 ", port=" + port +
                 ", type='" + type + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Proxy proxy = (Proxy) o;
+        long result = proxy.getSpeed() - this.getSpeed();
+        if(result > 0){
+            return 1;
+        }else if(result == 0){
+            return 0;
+        }
+        return -1;
     }
 }

@@ -34,7 +34,7 @@ public class CrawlerTest {
 
     @Test
     public void startCralwer(){
-//        worker.start();
+        worker.start();
 //        redisUtil.lSet("testKey","testValue");
 //        redisUtil.set("kaikai","name");
     }
