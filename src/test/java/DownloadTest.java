@@ -67,13 +67,17 @@ public class DownloadTest {
 //            logger.error(e.getMessage(),e);
 //        }
 //        System.out.println(System.getProperty("user.dir"));
-        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
+//        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
+            CreateFileUtil.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt","sdjlfsdfdsfs");
+
     }
 
+
+
     private void downloadZip(String language, String projectName, String downloadPath) {
-        downloadPath = downloadPath.replaceAll("archive", "zip");
-        downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
-        downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
+//        downloadPath = downloadPath.replaceAll("archive", "zip");
+//        downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
+//        downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
         String filePath = PROJECT_PATH + FILE_SEPARATOR + "github" + FILE_SEPARATOR + language + FILE_SEPARATOR + projectName + ".zip";
 //        File file = new File(filePath);
 

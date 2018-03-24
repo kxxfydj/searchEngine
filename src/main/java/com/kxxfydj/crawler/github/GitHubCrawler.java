@@ -15,7 +15,7 @@ import us.codecraft.webmagic.Spider;
 /**
  * create by kaiming_xu on 2017/9/2
  */
-@Crawl
+//@Crawl
 public class GitHubCrawler extends CrawlerBase{
 
     public GitHubCrawler(String language) {

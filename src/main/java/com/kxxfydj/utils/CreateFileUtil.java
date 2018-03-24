@@ -21,26 +21,7 @@ public class CreateFileUtil {
     }
 
     public static void generateFile(String path, String content) {
-        if (StringUtils.isBlank(path)) {
-            return;
-        }
-
-        String folderPath = path.substring(0, path.lastIndexOf(File.separator));
-        File folder = new File(folderPath);
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
-
-        try (FileOutputStream fileout = new FileOutputStream(path);
-             BufferedOutputStream out = new BufferedOutputStream(fileout)
-        ) {
-            out.write(content.getBytes());
-            out.flush();
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        generateFile(path,content.getBytes());
     }
 
     public static void generateFile(String path, byte[] content) {
@@ -57,6 +38,14 @@ public class CreateFileUtil {
                 return;
             }
         }
+
+        File file = new File(path);
+        if(file.exists()){
+            if(!file.delete()){
+                logger.error("删除文件出错！ 文件全路径名：{}",path);
+            }
+        }
+
         try (FileOutputStream fileout = new FileOutputStream(path);
              BufferedOutputStream out = new BufferedOutputStream(fileout)
         ) {

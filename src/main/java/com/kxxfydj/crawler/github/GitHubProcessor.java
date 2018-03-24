@@ -15,9 +15,14 @@ import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,9 +31,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GitHubProcessor implements PageProcessor {
 
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    private static final String PROJECT_PATH = "D:\\codeSource";
 
-    String PROJECT_PATH = System.getProperty("user.dir");
+    private static final String FILE_PATH = PROJECT_PATH + File.separator + "github" + File.separator;
 
     private static final String HOST = "codeload.github.com";
 
@@ -50,9 +55,12 @@ public class GitHubProcessor implements PageProcessor {
 
     private AtomicLong handleredCount = new AtomicLong(0L);
 
+    private ExecutorService executorService;
+
     public GitHubProcessor(Site site, String language) {
         this.site = site;
         this.language = language;
+        executorService = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -67,6 +75,9 @@ public class GitHubProcessor implements PageProcessor {
     }
 
     private void processFirstPage(Page page) {
+        if(page == null){
+            return;
+        }
         Document document = page.getHtml().getDocument();
         Elements repoList = document.select("#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > ul > div");
         for (Element repo : repoList) {
@@ -83,18 +94,16 @@ public class GitHubProcessor implements PageProcessor {
 //            Request request = RequestUtil.createGetRequest(nextUrl,CommonTag.FIRST_PAGE);
 //            page.addTargetRequest(request);
 //        }else
-        if (totalCount == handleredCount) {
-            page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
-            page.putField(PipelineKeys.LANGUAGE, this.language);
-            page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
-            page.putField(PipelineKeys.FINISHED, true);
-        }
+        checkFinished(page);
     }
 
     /**
      * @param page
      */
     private void processNextPage(Page page) {
+        if(page == null){
+            return ;
+        }
         Document document = page.getHtml().getDocument();
         String projectName = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
         String language = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > strong > a").first().text();
@@ -111,28 +120,61 @@ public class GitHubProcessor implements PageProcessor {
         codeInfo.setRepository("github");
         codeInfo.setGitPath(gitPath);
 
+        String filePath = FILE_PATH + language + File.separator + projectName + File.separator + projectName + ".zip";
+        codeInfo.setFilePath(filePath);
+
         codeInfoList.add(codeInfo);
         handleredCount.incrementAndGet();
-        downloadZip(language, projectName, downloadPath);
+        downloadZip(language, downloadPath);
+
+        checkFinished(page);
     }
 
-    private void downloadZip(String language, String projectName, String downloadPath) {
-        downloadPath = downloadPath.replaceAll("archive", "zip");
-        downloadPath = downloadPath.substring(0, downloadPath.lastIndexOf(".zip"));
-        downloadPath = downloadPath.replaceAll("github\\.com", "codeload.github.com");
-        String filePath = PROJECT_PATH + FILE_SEPARATOR + "github" + FILE_SEPARATOR + language + FILE_SEPARATOR + projectName;
-//        File file = new File(filePath);
-
+    private void downloadZip(String filePath, String downloadPath) {
         Map<String, String> requestHeaderMap;
         requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
-        jsoupRequestData.setProxyFromRedis();
+        jsoupRequestData.setFiddlerProxy();
+//        jsoupRequestData.setProxyFromSite(this.site);
         jsoupRequestData.setHeaders(requestHeaderMap);
-//            apacheHttpRequestData.setFiddlerProxy();
 
-        logger.info("downloading file {}", downloadPath);
-        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-        CreateFileUtil.generateFile(filePath, binaryData);
+        Future f = executorService.submit(new DownloadTask(filePath,downloadPath,jsoupRequestData));
+        try{
+            f.get(30, TimeUnit.SECONDS);
+        }catch (Exception e){
+            logger.error("文件下载超时，下载路径：{}", downloadPath);
+        }
+
+    }
+
+    private class DownloadTask implements Runnable {
+
+        private String downloadPath;
+
+        private JsoupRequestData jsoupRequestData;
+
+        private String filePath;
+
+        public DownloadTask(String filePath, String downloadPath, JsoupRequestData jsoupRequestData) {
+            this.downloadPath = downloadPath;
+            this.jsoupRequestData = jsoupRequestData;
+        }
+
+        @Override
+        public void run() {
+            logger.info("downloading file {}", downloadPath);
+            byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+            CreateFileUtil.generateFile(filePath, binaryData);
+        }
+    }
+
+    private void checkFinished(Page page) {
+        if (totalCount.get() == handleredCount.get()) {
+            page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
+            page.putField(PipelineKeys.LANGUAGE, this.language);
+            page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
+            page.putField(PipelineKeys.FINISHED, true);
+        }
     }
 
     @Override

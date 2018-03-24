@@ -1,6 +1,10 @@
 package com.kxxfydj.crawlerConfig;
 
 import com.kxxfydj.crawler.CrawlerBase;
+import com.kxxfydj.proxy.ProxyCenter;
+import com.kxxfydj.service.ProxyService;
+import com.kxxfydj.utils.ApplicationContextUtils;
+import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
@@ -10,6 +14,7 @@ import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 
 /**
  * create by kaiming_xu on 2017/9/3
@@ -39,8 +44,17 @@ public class MyHttpClientDownloader extends HttpClientDownloader {
         logger.info("downloading page : {}" ,request.getUrl());
         Page page = super.download(request, task);
         if(page == null){
-            logger.warn("the proxy is disabled");
+            int retryCount = 3;
+            while(retryCount -- > 0 && page == null) {
+                logger.warn("原代理失效ip：{}", crawlerBase.getProxyIp());
+                crawlerBase.changeProxy();
+                logger.warn("切换新代理ip：{}", crawlerBase.getProxyIp());
+                page =  super.download(request, task);
+            }
         }
-        return ;
+        if(page == null){
+            logger.error("download page failed! url:{}",request.getUrl());
+        }
+        return page;
     }
 }

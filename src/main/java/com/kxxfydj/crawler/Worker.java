@@ -30,7 +30,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  *
- * Created by chenwei on 2016/7/28.
+ * Created by kxxfydj on 2016/7/28.
  */
 @Service
 public class Worker {
@@ -99,14 +99,14 @@ public class Worker {
             //扫描指定包下的crawler任务,然后加入线程池任务队列
             List<Class<?>> clazzList = scanPackage(crawlerConfig.getSupportCrawlersPackages());
             for(Class<?> clazz : clazzList) {
-                Constructor<?> constructor = clazz.getConstructor(String.class);
-                Crawler crawler = (Crawler) constructor.newInstance("java");
-//                Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
+//                Constructor<?> constructor = clazz.getConstructor(String.class);
+//                Crawler crawler = (Crawler) constructor.newInstance("java");
+                Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
                 crawler.setCrawlerConfig(crawlerConfig);
                 queue.add(crawler);
             }
-//            | InvocationTargetException | NoSuchMethodException e
-        }catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+//            | InvocationTargetException | NoSuchMethodException
+        }catch (InstantiationException | IllegalAccessException e) {
             logger.error("class新建对象失败! message:{}",e.getMessage());
         } catch (IOException e){
             logger.error("ClassPathResource读取文件夹失败! message:{}",e.getMessage());

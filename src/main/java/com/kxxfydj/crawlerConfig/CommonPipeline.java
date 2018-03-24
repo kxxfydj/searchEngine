@@ -100,7 +100,7 @@ public class CommonPipeline implements Pipeline {
         logger.info("更新coderepository表{}条数据", rows);
 
         rows = codeInfoService.cleanCodeInfo();
-        logger.info("删除house表原有数据{}条!", rows);
+        logger.info("删除codeInfo表原有数据{}条!", rows);
 
         rows = codeInfoService.saveCodeInfo(codeInfoList);
         long endTime = System.currentTimeMillis();

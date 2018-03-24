@@ -1,14 +1,18 @@
 package com.kxxfydj.utils;
 
 
-import com.kxxfydj.entity.Proxy;
 import com.kxxfydj.proxy.ProxyCenter;
-import com.kxxfydj.redis.RedisUtil;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.springframework.web.context.ContextLoader;
+import us.codecraft.webmagic.Site;
 
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.net.Proxy;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by kxxfydj on 2018/3/5.
@@ -68,7 +72,7 @@ public class JsoupRequestData {
         return DEFAULT_TIMEOUT;
     }
 
-    public JsoupRequestData(){
+    public JsoupRequestData() {
         initJsoupRequestData();
     }
 
@@ -96,17 +100,23 @@ public class JsoupRequestData {
         statusCodeSet.add(HttpStatus.SC_TEMPORARY_REDIRECT);
     }
 
+    public void setProxyFromSite(Site site){
+        HttpHost httpHost = site.getHttpProxy();
+        if(httpHost != null){
+            InetSocketAddress socketAddress = new InetSocketAddress(httpHost.getHostName(),httpHost.getPort());
+            this.proxy = new Proxy(Proxy.Type.HTTP,socketAddress);
+        }
+    }
+
     public void setProxyFromRedis() {
-        if (ContextLoader.getCurrentWebApplicationContext() != null) {
-            ProxyCenter proxyCenter = ContextLoader.getCurrentWebApplicationContext().getBean(ProxyCenter.class);
-            RedisUtil<String, Proxy> redisTemplate = ContextLoader.getCurrentWebApplicationContext().getBean(RedisUtil.class);
-            List<Proxy> proxyList = redisTemplate.lGet("proxyList", 0, 99);
-            this.proxy = proxyCenter.availableProxy(proxyList);
+        ProxyCenter proxyCenter = ApplicationContextUtils.getBean(ProxyCenter.class);
+        if(proxyCenter != null) {
+            this.proxy = proxyCenter.availableProxy();
         }
     }
 
     public void setFiddlerProxy() {
-        InetSocketAddress fiddlerSocket = new InetSocketAddress("127.0.0.1",8888 );
+        InetSocketAddress fiddlerSocket = new InetSocketAddress("127.0.0.1", 8888);
         this.proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, fiddlerSocket);
     }
 

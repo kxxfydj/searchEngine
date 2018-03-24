@@ -13,6 +13,10 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +85,8 @@ public class HttpsUtils {
 
             Connection connection = Jsoup
                     .connect(url)
-                    .timeout(timeOut);
+                    .timeout(timeOut)
+                    .followRedirects(true);
 
             //set headers
             Map<String, String> headers = jsoupRequestData.getHeaders();
@@ -133,7 +138,20 @@ public class HttpsUtils {
                 return getBytesFromRequest(rediConnection,jsoupRequestData);
             }
 
-            return response.bodyAsBytes();
+            try(BufferedInputStream bis = response.bodyStream();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream()
+            ) {
+                int bufferLength = 1024;
+                byte[] buffer = new byte[bufferLength];
+                int len = 0;
+                while ((len = bis.read(buffer,0,bufferLength)) != -1) {
+                    baos.write(buffer,0,len);
+                }
+                return baos.toByteArray();
+            }catch (IOException e){
+
+            }
+            return null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

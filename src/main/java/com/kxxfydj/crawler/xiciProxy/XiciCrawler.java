@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by kxxfydj on 2018/3/16.
  */
-//@Crawl
+@Crawl
 public class XiciCrawler extends CrawlerBase {
     @Override
     public void run() {
@@ -31,7 +31,7 @@ public class XiciCrawler extends CrawlerBase {
 
         Spider spider = Spider
                 .create(new XiciProcessor(site))
-                .setDownloader(new MyHttpClientDownloader())
+                .setDownloader(new MyHttpClientDownloader(this))
                 .addRequest(request)
                 .setScheduler(new MyQueueScheduler())
                 .thread(crawlerConfig.getSpiderThreadSize())

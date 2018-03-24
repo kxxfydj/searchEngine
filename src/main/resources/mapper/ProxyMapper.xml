@@ -27,14 +27,14 @@
         <trim prefix="speed =case" suffix="end,">
             <foreach collection="list" item="proxy">
                 <if test="proxy.speed!=null">
-                    when id=#{proxy.id} then #{proxy.speed}
+                    when ip=#{proxy.ip} then #{proxy.speed}
                 </if>
             </foreach>
         </trim>
         <trim prefix="usedTimes =case" suffix="end,">
             <foreach collection="list" item="proxy">
                 <if test="proxy.usedTimes!=null">
-                    when id=#{proxy.id} then #{proxy.usedTimes}
+                    when ip=#{proxy.ip} then #{proxy.usedTimes}
                 </if>
             </foreach>
         </trim>
