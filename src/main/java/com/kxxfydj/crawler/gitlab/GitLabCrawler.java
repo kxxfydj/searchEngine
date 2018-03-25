@@ -1,43 +1,34 @@
-package com.kxxfydj.crawler.github;
+package com.kxxfydj.crawler.gitlab;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.crawler.CrawlerBase;
+import com.kxxfydj.crawler.github.GitHubProcessor;
 import com.kxxfydj.crawlerConfig.CommonPipeline;
 import com.kxxfydj.crawlerConfig.CrawlerListener;
 import com.kxxfydj.crawlerConfig.MyHttpClientDownloader;
 import com.kxxfydj.crawlerConfig.MyQueueScheduler;
-import com.kxxfydj.crawlerConfig.annotation.Crawl;
-import com.kxxfydj.utils.*;
-import org.apache.http.HttpHost;
+import com.kxxfydj.utils.RequestUtil;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
 
 /**
- * create by kaiming_xu on 2017/9/2
+ * Created by kxxfydj on 2018/3/24.
  */
-//@Crawl
-public class GitHubCrawler extends CrawlerBase{
-
-    public GitHubCrawler(String language) {
-        super(language);
-    }
-
-    public GitHubCrawler(){
-        super();
-    }
+public class GitLabCrawler extends CrawlerBase{
 
     @Override
     public void run() {
-
-        site = site.addHeader("Referer","https://github.com/")
+        site = site.addHeader("Referer","https://gitlab.com/explore/projects/trending")
                 .setTimeOut(15*1000)
-                .addHeader("Host","github.com");
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
+                .addHeader("Host","gitlab.com");
 
         super.setProxy();
-        Request request = RequestUtil.createGetRequest("https://github.com/search?utf8=%E2%9C%93&q=" + this.condition + "&type=",CommonTag.FIRST_PAGE);
+        Request request = RequestUtil.createGetRequest("https://gitlab.com/explore/projects/starred", CommonTag.FIRST_PAGE);
 
         Spider spider = Spider
-                .create(new GitHubProcessor(site,this.condition))
+                .create(new GitLabProcessor(site))
                 .setDownloader(new MyHttpClientDownloader(this))
                 .addRequest(request)
                 .setScheduler(new MyQueueScheduler())
@@ -47,5 +38,4 @@ public class GitHubCrawler extends CrawlerBase{
         new CrawlerListener(spider);
         spider.start();
     }
-
 }

@@ -80,13 +80,12 @@ public class CommonPipeline implements Pipeline {
      */
     private void processCodeInfo(List<CodeInfo> codeInfoList,ResultItems resultItems){
         String cralwerType = resultItems.get(PipelineKeys.CRAWLER_TYPE);
-        String language = resultItems.get(PipelineKeys.LANGUAGE);
 
         //初始化house的cityId
         int rows;
         long startTime = System.currentTimeMillis();
 
-        CodeRepository codeRepository = codeRepositoryService.getRepositoryByNameAndLanguage(cralwerType, language);
+        CodeRepository codeRepository = codeRepositoryService.getRepositoryByName(cralwerType);
         int codeRepositoryId = codeRepository.getId();
         int count = 0;
         for (CodeInfo codeInfo : codeInfoList) {

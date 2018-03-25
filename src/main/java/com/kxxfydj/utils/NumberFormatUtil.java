@@ -13,7 +13,7 @@ public class NumberFormatUtil {
             throw new RuntimeException("the number String is null");
         }
 
-        String noComma = intString.replaceAll(",","");
+        String noComma = intString.replaceAll(",","").replaceAll("k","000");
         return Integer.parseInt(noComma);
     }
 

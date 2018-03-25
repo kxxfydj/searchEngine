@@ -9,10 +9,11 @@ public class PipelineKeys {
 
     public static final String PROXY_LIST = "proxyList";
 
-
     public static final String CRAWLER_TYPE = "crawlerType";
 
-    public static final String LANGUAGE = "language";
+    public static final String REPOSITORY_NAME = "repositoryName";
+
+    public static final String CONDITION = "condition";
 
     /**
      * 爬取结束标志，开始持久化操作

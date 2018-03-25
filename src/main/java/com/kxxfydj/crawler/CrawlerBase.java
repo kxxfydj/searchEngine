@@ -25,13 +25,13 @@ public abstract class CrawlerBase implements Crawler {
 
     protected CrawlerConfig crawlerConfig;
 
-    protected String language;
+    protected String condition;
 
     protected Site site = Site.me()
             .setSleepTime(500);
 
-    protected CrawlerBase(String language){
-        this.language = language;
+    protected CrawlerBase(String condition){
+        this.condition = condition;
     }
 
     protected CrawlerBase(){}

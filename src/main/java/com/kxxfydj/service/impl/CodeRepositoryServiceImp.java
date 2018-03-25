@@ -17,7 +17,7 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     CodeRepositoryMapper codeRepositoryMapper;
 
     @Override
-    public List<CodeRepository> getRepositoryByName(String repositoryName) {
+    public CodeRepository getRepositoryByName(String repositoryName) {
         return codeRepositoryMapper.selectByName(repositoryName);
     }
 
@@ -27,8 +27,8 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     }
 
     @Override
-    public CodeRepository getRepositoryByNameAndLanguage(String repositoryName, String language) {
-        return codeRepositoryMapper.selectByNameAndLanguage(repositoryName,language);
+    public CodeRepository getRepositoryByNameAndCondition(String repositoryName, String condition) {
+        return codeRepositoryMapper.selectByNameAndCondition(repositoryName,condition);
     }
 
     @Override

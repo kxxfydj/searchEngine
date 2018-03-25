@@ -9,8 +9,8 @@ import java.util.List;
  * Created by kxxfydj on 2018/3/10.
  */
 public interface CodeRepositoryMapper {
-    List<CodeRepository> selectByName(String repositoryName);
-    CodeRepository selectByNameAndLanguage(@Param("repositoryName") String repositoryName, @Param("language") String language);
+    CodeRepository selectByName(String repositoryName);
+    CodeRepository selectByNameAndCondition(@Param("repositoryName") String repositoryName, @Param("condition") String condition);
     void insert(CodeRepository codeRepository);
     int updateCodeRepository(CodeRepository codeRepository);
 }

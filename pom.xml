@@ -259,6 +259,13 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.9.4</version>
         </dependency>
+
+        <!-- java 元组支持 -->
+        <dependency>
+            <groupId>org.javatuples</groupId>
+            <artifactId>javatuples</artifactId>
+            <version>1.2</version>
+        </dependency>
     </dependencies>
 
     <build>

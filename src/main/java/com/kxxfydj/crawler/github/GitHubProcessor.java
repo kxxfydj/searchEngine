@@ -3,8 +3,11 @@ package com.kxxfydj.crawler.github;
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.common.CrawlerTypeEnum;
 import com.kxxfydj.common.PipelineKeys;
+import com.kxxfydj.crawler.CodeProcessor;
 import com.kxxfydj.entity.CodeInfo;
-import com.kxxfydj.utils.*;
+import com.kxxfydj.utils.NumberFormatUtil;
+import com.kxxfydj.utils.RequestUtil;
+import org.javatuples.Pair;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,41 +16,25 @@ import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.processor.PageProcessor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * create by kaiming_xu on 2017/9/2
  */
-public class GitHubProcessor implements PageProcessor {
+public class GitHubProcessor extends CodeProcessor {
 
     private static final String PROJECT_PATH = "D:\\codeSource";
 
     private static final String FILE_PATH = PROJECT_PATH + File.separator + "github" + File.separator;
 
-    private static final String HOST = "codeload.github.com";
-
-    private static final String REFERER = "https://github.com";
-
-    private static final String USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
-
-    private static Logger logger = LoggerFactory.getLogger(GitHubProcessor.class);
-
-    private Site site;
-
-    private String language;
-
     private List<CodeInfo> codeInfoList = new ArrayList<>();
+
+    private String condition;
 
     private AtomicInteger pageCount = new AtomicInteger(0);
 
@@ -55,27 +42,18 @@ public class GitHubProcessor implements PageProcessor {
 
     private AtomicLong handleredCount = new AtomicLong(0L);
 
-    private ExecutorService executorService;
 
-    public GitHubProcessor(Site site, String language) {
-        this.site = site;
-        this.language = language;
-        executorService = Executors.newCachedThreadPool();
+    public GitHubProcessor(Site site, String condition) {
+        super(site);
+        this.condition = condition;
+        super.host = "codeload.github.com";
+        super.referer = "https://github.com";
+        super.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
     }
 
     @Override
-    public void process(Page page) {
-        String type = (String) page.getRequest().getExtra(CommonTag.TYPE);
-
-        if (CommonTag.FIRST_PAGE.equals(type)) {
-            processFirstPage(page);
-        } else if (CommonTag.NEXT_PAGE.equals(type)) {
-            processNextPage(page);
-        }
-    }
-
-    private void processFirstPage(Page page) {
-        if(page == null){
+    protected void parseFirstPage(Page page) {
+        if (page == null) {
             return;
         }
         Document document = page.getHtml().getDocument();
@@ -94,15 +72,12 @@ public class GitHubProcessor implements PageProcessor {
 //            Request request = RequestUtil.createGetRequest(nextUrl,CommonTag.FIRST_PAGE);
 //            page.addTargetRequest(request);
 //        }else
-        checkFinished(page);
     }
 
-    /**
-     * @param page
-     */
-    private void processNextPage(Page page) {
-        if(page == null){
-            return ;
+    @Override
+    protected Pair<String, String> parseNextPage(Page page) {
+        if (page == null) {
+            return null;
         }
         Document document = page.getHtml().getDocument();
         String projectName = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
@@ -120,65 +95,22 @@ public class GitHubProcessor implements PageProcessor {
         codeInfo.setRepository("github");
         codeInfo.setGitPath(gitPath);
 
-        String filePath = FILE_PATH + language + File.separator + projectName + File.separator + projectName + ".zip";
+        String filePath = FILE_PATH + File.separator + projectName + File.separator + projectName + ".zip";
         codeInfo.setFilePath(filePath);
 
         codeInfoList.add(codeInfo);
         handleredCount.incrementAndGet();
-        downloadZip(language, downloadPath);
 
-        checkFinished(page);
+        return new Pair<>(filePath, downloadPath);
     }
 
-    private void downloadZip(String filePath, String downloadPath) {
-        Map<String, String> requestHeaderMap;
-        requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
-        JsoupRequestData jsoupRequestData = new JsoupRequestData();
-        jsoupRequestData.setFiddlerProxy();
-//        jsoupRequestData.setProxyFromSite(this.site);
-        jsoupRequestData.setHeaders(requestHeaderMap);
-
-        Future f = executorService.submit(new DownloadTask(filePath,downloadPath,jsoupRequestData));
-        try{
-            f.get(30, TimeUnit.SECONDS);
-        }catch (Exception e){
-            logger.error("文件下载超时，下载路径：{}", downloadPath);
-        }
-
-    }
-
-    private class DownloadTask implements Runnable {
-
-        private String downloadPath;
-
-        private JsoupRequestData jsoupRequestData;
-
-        private String filePath;
-
-        public DownloadTask(String filePath, String downloadPath, JsoupRequestData jsoupRequestData) {
-            this.downloadPath = downloadPath;
-            this.jsoupRequestData = jsoupRequestData;
-        }
-
-        @Override
-        public void run() {
-            logger.info("downloading file {}", downloadPath);
-            byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-            CreateFileUtil.generateFile(filePath, binaryData);
-        }
-    }
-
-    private void checkFinished(Page page) {
+    @Override
+    protected void checkFinished(Page page) {
         if (totalCount.get() == handleredCount.get()) {
             page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
-            page.putField(PipelineKeys.LANGUAGE, this.language);
             page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
             page.putField(PipelineKeys.FINISHED, true);
         }
     }
 
-    @Override
-    public Site getSite() {
-        return this.site;
-    }
 }

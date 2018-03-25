@@ -86,6 +86,7 @@ public class HttpsUtils {
             Connection connection = Jsoup
                     .connect(url)
                     .timeout(timeOut)
+                    .maxBodySize(jsoupRequestData.getMaxSize())
                     .followRedirects(true);
 
             //set headers

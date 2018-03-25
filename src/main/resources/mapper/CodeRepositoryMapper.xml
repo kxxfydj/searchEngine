@@ -4,7 +4,7 @@
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeRepository">
         <result column="repositoryName" jdbcType="VARCHAR" property="repositoryName"/>
         <result column="projectCount" jdbcType="INTEGER" property="projectCount"/>
-        <result column="language" jdbcType="VARCHAR" property="language"/>
+        <result column="condition" jdbcType="VARCHAR" property="condition"/>
     </resultMap>
 
     <select id="selectByName" resultMap="baseResultMap">
@@ -12,18 +12,33 @@
     </select>
 
     <insert id="insert" parameterType="com.kxxfydj.entity.CodeRepository">
-        INSERT INTO coderepository(repositoryName,projectCount,language) values (
-        #{repositoryName,jdbcType=VARCHAR},
-        #{projectCount,jdbcType=INTEGER},
-        #{language,jdbcType=VARCHAR}
-        );
+        INSERT INTO coderepository
+        <trim prefix = "(" suffix=")" suffixOverrides=",">
+            repositoryName,projectCount,
+            <if test="condition != null">
+                condition
+            </if>
+        </trim>
+        <trim prefix="values(" suffix=")" suffixOverrides=",">
+            #{repositoryName,jdbcType=VARCHAR},
+            #{projectCount,jdbcType=INTEGER},
+            <if test="condition != null">
+                #{condition,jdbcType=VARCHAR}
+            </if>
+        </trim>
     </insert>
 
-    <select id="selectByNameAndLanguage" resultMap="baseResultMap">
-        select * from coderepository where repositoryName = #{repositoryName} and language = #{language};
+    <select id="selectByNameAndCondition" resultMap="baseResultMap">
+        select * from coderepository where repositoryName = #{repositoryName}
+        <if test="condition != null">
+            and condition = #{condition}
+        </if>
     </select>
 
     <update id="updateCodeRepository" parameterType="com.kxxfydj.entity.CodeRepository">
-        UPDATE coderepository SET projectCount = #{projectCount} where repositoryName = #{repositoryName} and language = #{language};
+        UPDATE coderepository SET projectCount = #{projectCount} where repositoryName = #{repositoryName}
+         <if test="condition != null">
+             and condition = #{condition}
+         </if>
     </update>
 </mapper>

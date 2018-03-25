@@ -53,12 +53,25 @@ public class JsoupRequestData {
     private Set<Integer> statusCodeSet;
 
     /**
+     * 回复体最大字节数，默认为1MB
+     */
+    private int maxSize = 1024 * 1024;
+
+    /**
      * 响应头
      */
     private Map<String, String> responseHeaders;
 
     private Object requestData;
 
+
+    public int getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(int maxSize) {
+        this.maxSize = maxSize;
+    }
 
     public java.net.Proxy getProxy() {
         return proxy;
