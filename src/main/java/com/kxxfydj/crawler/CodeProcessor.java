@@ -2,6 +2,7 @@ package com.kxxfydj.crawler;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.crawler.github.GitHubProcessor;
+import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.CreateFileUtil;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.HttpsUtils;
@@ -14,6 +15,7 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
+import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +29,10 @@ public abstract class CodeProcessor implements PageProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeProcessor.class);
 
+    protected CrawlerTask crawlerTask;
+
+    protected String filePath;
+
     private Site site;
 
     private ExecutorService executorService;
@@ -37,8 +43,10 @@ public abstract class CodeProcessor implements PageProcessor {
 
     protected String userAgent;
 
-    public CodeProcessor(Site site) {
+    public CodeProcessor(Site site, CrawlerTask crawlerTask) {
+        this.crawlerTask = crawlerTask;
         this.site = site;
+        this.filePath = crawlerTask.getCodeFilePath() + File.separator + crawlerTask.getCrawlerName() + File.separator;
         executorService = Executors.newCachedThreadPool();
     }
 

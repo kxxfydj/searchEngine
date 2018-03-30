@@ -41,7 +41,7 @@ public class CrawlerTest {
     public void startCralwer() {
 //        ContextLoader.getCurrentWebApplicationContext();
 //        ProxyCenter proxyCenter = ApplicationContextUtils.getBean(ProxyCenter.class);
-        worker.start();
+//        worker.start();
 //        redisUtil.lSet("testKey","testValue");
 //        redisUtil.set("kaikai","name");
     }

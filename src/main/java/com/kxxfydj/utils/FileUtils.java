@@ -1,6 +1,8 @@
 package com.kxxfydj.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -11,9 +13,40 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Created by kxxfydj on 2018/3/2.
+ * Created by kxxfydj on 2018/3/30.
  */
-public class ZipUtil {
+public class FileUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
+    public static boolean deleteFiles(String filePath) {
+        boolean flag = true;
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return !flag;
+        }
+        if (!file.isDirectory()) {
+            return file.delete();
+        }
+        String[] tempList = file.list();
+        File temp = null;
+        for (String aTempList : tempList) {
+            if (filePath.endsWith(File.separator)) {
+                temp = new File(filePath + aTempList);
+            } else {
+                temp = new File(filePath + File.separator + aTempList);
+            }
+            if (temp.isFile()) {
+                flag = flag && temp.delete();
+            } else if (temp.isDirectory()) {
+//                boolean tempFlag = deleteFiles(filePath + File.separator + aTempList);//先删除文件夹里面的文件
+                flag = flag && deleteFiles(filePath + File.separator + aTempList);//先删除文件夹里面的文件
+            }
+        }
+        flag = flag && file.delete();
+        return flag;
+    }
+
     /**
      * 解压缩zip包
      *
@@ -43,9 +76,13 @@ public class ZipUtil {
 
         //开始解压
         ZipEntry entry = null;
-        String entryFilePath = null, entryDirPath = null;
-        File entryFile = null, entryDir = null;
-        int index = 0, count = 0, bufferSize = 1024;
+        String entryFilePath;
+        String entryDirPath;
+        File entryFile = null;
+        File entryDir;
+        int index;
+        int count;
+        int bufferSize = 1024;
         byte[] buffer = new byte[bufferSize];
         try (
                 ZipFile zip = new ZipFile(zipFile);
@@ -86,11 +123,9 @@ public class ZipUtil {
                     bos.write(buffer, 0, count);
                 }
                 bos.flush();
-                bos.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("解压文件出错！",e.getMessage(),e);
         }
     }
-
 }

@@ -7,6 +7,10 @@
         <result column="condition" jdbcType="VARCHAR" property="condition"/>
     </resultMap>
 
+    <select id="selectAll" resultMap="baseResultMap">
+        SELECT * from coderepositoty;
+    </select>
+
     <select id="selectByName" resultMap="baseResultMap">
         SELECT * from coderepository where repositoryName = #{repositoryName};
     </select>

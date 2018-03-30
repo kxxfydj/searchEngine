@@ -2,6 +2,7 @@ package com.kxxfydj.crawler;
 
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
 import com.kxxfydj.crawlerConfig.annotation.Crawl;
+import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.entity.Proxy;
 import com.kxxfydj.proxy.ProxyCenter;
 import com.kxxfydj.redis.RedisUtil;
@@ -27,14 +28,19 @@ public abstract class CrawlerBase implements Crawler {
 
     protected String condition;
 
+    protected CrawlerTask crawlerTask;
+
     protected Site site = Site.me()
             .setSleepTime(500);
 
-    protected CrawlerBase(String condition){
-        this.condition = condition;
+    public CrawlerTask getCrawlerTask() {
+        return crawlerTask;
     }
 
-    protected CrawlerBase(){}
+    @Override
+    public void setCrawlerTask(CrawlerTask crawlerTask) {
+        this.crawlerTask = crawlerTask;
+    }
 
     protected void setProxy(){
         ProxyCenter proxyCenter = ApplicationContextUtils.getBean(ProxyCenter.class);

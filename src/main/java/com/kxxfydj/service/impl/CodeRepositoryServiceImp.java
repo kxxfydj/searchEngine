@@ -35,4 +35,9 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     public int refreshCount(CodeRepository codeRepository) {
         return codeRepositoryMapper.updateCodeRepository(codeRepository);
     }
+
+    @Override
+    public List<CodeRepository> getAllRepostitory() {
+        return codeRepositoryMapper.selectAll();
+    }
 }

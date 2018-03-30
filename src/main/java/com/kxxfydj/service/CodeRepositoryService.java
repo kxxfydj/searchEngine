@@ -8,6 +8,7 @@ import java.util.List;
  * Created by kxxfydj on 2018/3/10.
  */
 public interface CodeRepositoryService {
+    List<CodeRepository> getAllRepostitory();
     CodeRepository getRepositoryByName(String repositoryName);
     void addRepository(CodeRepository codeRepository);
     CodeRepository getRepositoryByNameAndCondition(String repositoryName,String condition);

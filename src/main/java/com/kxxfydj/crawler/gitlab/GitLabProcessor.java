@@ -5,6 +5,7 @@ import com.kxxfydj.common.CrawlerTypeEnum;
 import com.kxxfydj.common.PipelineKeys;
 import com.kxxfydj.crawler.CodeProcessor;
 import com.kxxfydj.entity.CodeInfo;
+import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.NumberFormatUtil;
 import com.kxxfydj.utils.RequestUtil;
 import org.javatuples.Pair;
@@ -26,21 +27,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GitLabProcessor extends CodeProcessor {
 
-    private static final String PROJECT_PATH = "D:\\codeSource";
-
-    private static final String FILE_PATH = PROJECT_PATH + File.separator + "gitlab" + File.separator;
-
     private AtomicInteger totalCount = new AtomicInteger(0);
 
     private AtomicInteger handlerdCount = new AtomicInteger(0);
 
     private List<CodeInfo> codeInfoList = new ArrayList<>();
 
-    public GitLabProcessor(Site site) {
-        super(site);
-        this.host = "";
-        this.referer = "";
-        this.userAgent = "";
+    public GitLabProcessor(Site site, CrawlerTask crawlerTask) {
+        super(site,crawlerTask);
+        this.host = "gitlab.com";
+        this.referer = null;
+        this.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
     }
 
     @Override
@@ -90,7 +87,8 @@ public class GitLabProcessor extends CodeProcessor {
         codeInfo.setDescription(description);
         codeInfoList.add(codeInfo);
 
-        String filePath = FILE_PATH + File.separator + projectName + File.separator + projectName + ".zip";
+        String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
+        codeInfo.setFilePath(filePath);
 
         handlerdCount.incrementAndGet();
         return new Pair<>(filePath,downloadPath);

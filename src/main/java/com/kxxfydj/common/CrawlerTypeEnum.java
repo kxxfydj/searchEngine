@@ -5,7 +5,8 @@ package com.kxxfydj.common;
  */
 public enum CrawlerTypeEnum {
     GITLAB("gitlab"),
-    GITHUB("github");
+    GITHUB("github"),
+    XICI("xici");
 
     private String type;
 
