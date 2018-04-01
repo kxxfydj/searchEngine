@@ -59,6 +59,12 @@ public class CrawlerConfig {
     @Value("#{settings['global.debug.switch']}")
     private Boolean debugSwitch;
 
+    @Value("#{settings['crawler.codefile.path']}")
+    private String codezipPath;
+
+    @Value("#{settings['crawler.unzipfile.path']}")
+    private String codeunzipPath;
+
     private Map<String ,Class<Crawler>> supportCrawlerClazzMap = new HashMap<>();
 
     public Map<String, Class<Crawler>> getSupportCrawlerClazzMap() {
@@ -88,7 +94,7 @@ public class CrawlerConfig {
 
         try {
             //扫描任务包
-            String path = crawlPackage.replaceAll("\\.", File.separator);
+            String path = crawlPackage.replaceAll("\\.", "\\" + File.separator);
             Resource resource = new ClassPathResource(path);
             File resourceFile = resource.getFile();
             //去除不是包的文件
@@ -214,5 +220,21 @@ public class CrawlerConfig {
 
     public void setDebugSwitch(Boolean debugSwitch) {
         this.debugSwitch = debugSwitch;
+    }
+
+    public String getCodezipPath() {
+        return codezipPath;
+    }
+
+    public void setCodezipPath(String codezipPath) {
+        this.codezipPath = codezipPath;
+    }
+
+    public String getCodeunzipPath() {
+        return codeunzipPath;
+    }
+
+    public void setCodeunzipPath(String codeunzipPath) {
+        this.codeunzipPath = codeunzipPath;
     }
 }
