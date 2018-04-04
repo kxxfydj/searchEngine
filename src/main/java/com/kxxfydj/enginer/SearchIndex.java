@@ -31,7 +31,7 @@ public class SearchIndex {
     private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
 
     @Autowired
-    private RedisUtil<String,List<HitDocument>> redisUtil;
+    private RedisUtil<String,HitDocument> redisUtil;
 
     @Autowired
     private EngineConfig engineConfig;
@@ -40,7 +40,7 @@ public class SearchIndex {
         this.engineConfig = engineConfig;
     }
 
-    public void searchIndex(String clauses){
+    public List<HitDocument> searchIndex(String clauses){
         try(
                 Directory directory = FSDirectory.open(Paths.get(engineConfig.getIndexFile()));
                 Analyzer analyzer = new StandardAnalyzer();
@@ -63,13 +63,13 @@ public class SearchIndex {
                 documentList.add(document);
             }
 
-            Map<String,List<HitDocument>> listMap = new HashMap<>();
-            listMap.put(clauses, documentList);
+            redisUtil.lSet("documentList:" + clauses,documentList,60*60);   //一小时过期
+            logger.info("lucene查询字段结果已缓存 clause:{}  并设置一小时过期", clauses);
 
-            redisUtil.hmset("documentList",listMap);
-            logger.info("lucene查询字段结果已缓存 clause:{}", clauses);
+            return documentList;
         }catch (Exception e){
             logger.error(e.getMessage(),e);
         }
+        return null;
     }
 }

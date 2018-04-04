@@ -10,6 +10,8 @@ public class HitDocument {
 
     private String path;
 
+
+
     public String getFileName() {
         return fileName;
     }

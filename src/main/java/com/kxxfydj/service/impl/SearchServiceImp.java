@@ -7,13 +7,16 @@ import com.kxxfydj.service.SearchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.swing.text.Document;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by kxxfydj on 2018/4/4.
  */
+@Service
 public class SearchServiceImp implements SearchService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchServiceImp.class);
@@ -22,21 +25,27 @@ public class SearchServiceImp implements SearchService {
     private SearchIndex searchIndex;
 
     @Autowired
-    RedisUtil<String,List<HitDocument>> redisUtil;
+    RedisUtil<String,HitDocument> redisUtil;
 
     @Override
     public List<HitDocument> defaultSearchContent(String content) {
         String clause = "content:" + content;
-        Map<String, List<HitDocument>> listMap = redisUtil.hmget("documentList");
-        List<HitDocument> documentList = listMap.get(clause);
-        if(documentList != null || !documentList.isEmpty()){
-            searchIndex.searchIndex(clause);
-        }
-        return null;
+        return handlerSearch(clause);
     }
 
     @Override
     public List<HitDocument> fieldSearch(String filed, String content) {
-        return null;
+        String clause = filed + ":" + content;
+        return handlerSearch(clause);
+    }
+
+    private List<HitDocument> handlerSearch(String clause){
+        List<HitDocument> documentList = redisUtil.lGet("documentList" + clause,0,-1);
+        if(documentList != null || !documentList.isEmpty()){
+            logger.info("查询语句有缓存，从缓存中读取数据");
+            return documentList;
+        }
+
+        return searchIndex.searchIndex(clause);
     }
 }
