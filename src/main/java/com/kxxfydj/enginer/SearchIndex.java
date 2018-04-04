@@ -66,8 +66,8 @@ public class SearchIndex {
             Map<String,List<HitDocument>> listMap = new HashMap<>();
             listMap.put(clauses, documentList);
 
-            redisUtil.hmset("documentList",listMap,60*60);  //一小时过期
-            logger.info("lucene查询字段结果已缓存，设置过期时间一小时  clause:{}", clauses);
+            redisUtil.hmset("documentList",listMap);
+            logger.info("lucene查询字段结果已缓存 clause:{}", clauses);
         }catch (Exception e){
             logger.error(e.getMessage(),e);
         }

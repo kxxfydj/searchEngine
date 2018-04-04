@@ -1,5 +1,6 @@
 package com.kxxfydj.redis;
 
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
@@ -156,8 +157,9 @@ public class RedisUtil<K,V> {
      * @param item 项 不能为null
      * @return 值
      */
-    public Object hget(String key,String item){
-        return redisTemplate.opsForHash().get(key, item);
+    public <T,H> H hget(K key,T item){
+        HashOperations<K,T,H> operations = redisTemplate.opsForHash();
+        return operations.get(key, item);
     }
 
     /**
@@ -212,7 +214,7 @@ public class RedisUtil<K,V> {
      * @param value 值
      * @return true 成功 false失败
      */
-    public boolean hset(String key,String item,Object value) {
+    public <T,H> boolean hset(String key,T item,H value) {
         try {
             redisTemplate.opsForHash().put(key, item, value);
             return true;
@@ -230,7 +232,7 @@ public class RedisUtil<K,V> {
      * @param time 时间(秒)注意:如果已存在的hash表有时间,这里将会替换原有的时间
      * @return true 成功 false失败
      */
-    public boolean hset(String key,String item,Object value,long time) {
+    public <T,H> boolean hset(String key,T item,H value,long time) {
         try {
             redisTemplate.opsForHash().put(key, item, value);
             if(time>0){
