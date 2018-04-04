@@ -3,12 +3,16 @@
 <mapper namespace="com.kxxfydj.mapper.CodeContentMapper">
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeContent">
         <id column="path" jdbcType="VARCHAR" property="path"/>
-        <result column="body" jdbcType="VARCHAR" property="repository"/>
+        <result column="body" jdbcType="VARCHAR" property="body"/>
         <result column="addTime" jdbcType="TIMESTAMP" property="addTime"/>
-        <result column="updateTime" jdbcType="TIMESTAMP" property="language"/>
+        <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="fatherPath" jdbcType="VARCHAR" property="fatherPath"/>
         <result column="enabled" jdbcType="TINYINT" property="enabled"/>
     </resultMap>
+
+    <select id="selectAll" resultMap="baseResultMap">
+        SELECT * from codecontent;
+    </select>
 
     <select id="selectChildren" resultMap="baseResultMap">
         SELECT * from codecontent where path LIKE #{path} + "%" AND enabled = 1;

@@ -165,7 +165,7 @@ public class RedisUtil<K,V> {
      * @param key 键
      * @return 对应的多个键值
      */
-    public Map<Object,Object> hmget(String key){
+    public <H> Map<K,H> hmget(String key){
         return redisTemplate.opsForHash().entries(key);
     }
 
@@ -175,7 +175,7 @@ public class RedisUtil<K,V> {
      * @param map 对应多个键值
      * @return true 成功 false 失败
      */
-    public boolean hmset(String key, Map<String,Object> map){
+    public <H> boolean hmset(String key, Map<String,H> map){
         try {
             redisTemplate.opsForHash().putAll(key, map);
             return true;
@@ -192,7 +192,7 @@ public class RedisUtil<K,V> {
      * @param time 时间(秒)
      * @return true成功 false失败
      */
-    public boolean hmset(String key, Map<String,Object> map, long time){
+    public <H> boolean hmset(String key, Map<String,H> map, long time){
         try {
             redisTemplate.opsForHash().putAll(key, map);
             if(time>0){

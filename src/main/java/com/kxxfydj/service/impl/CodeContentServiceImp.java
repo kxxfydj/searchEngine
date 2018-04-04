@@ -18,6 +18,11 @@ public class CodeContentServiceImp implements CodeContentService {
     CodeContentMapper codeContentMapper;
 
     @Override
+    public List<CodeContent> getAllFiles() {
+        return codeContentMapper.selectAll();
+    }
+
+    @Override
     public List<CodeContent> getFileChildren(CodeContent codeContent) {
         return filterContentByDate(codeContentMapper.selectChildren(codeContent));
     }

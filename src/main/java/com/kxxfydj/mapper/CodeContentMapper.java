@@ -8,6 +8,8 @@ import java.util.List;
  * Created by kxxfydj on 2018/3/31.
  */
 public interface CodeContentMapper {
+    List<CodeContent> selectAll();
+
     List<CodeContent> selectChildren(CodeContent codeContent);
     CodeContent selectFather(CodeContent codeContent);
     List<CodeContent> selectAncestor(CodeContent codeContent);

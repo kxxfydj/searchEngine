@@ -15,7 +15,7 @@
             <list>
                 <value>classpath:log4j.properties</value>
                 <value>classpath:crawl-config.properties</value>
-                <!--<value>classpath:redis.properties</value>-->
+                <value>classpath:engine-config.properties</value>
             </list>
         </constructor-arg>
     </bean>

@@ -8,6 +8,8 @@ import java.util.List;
  * Created by kxxfydj on 2018/4/1.
  */
 public interface CodeContentService {
+
+    List<CodeContent> getAllFiles();
     List<CodeContent> getFileChildren(CodeContent codeContent);
     CodeContent getFileFather(CodeContent codeContent);
     List<CodeContent> getFileAncestor(CodeContent codeContent);

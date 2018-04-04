@@ -8,6 +8,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 /**
  * Created by kxxfydj on 2018/4/1.
  */
@@ -29,5 +36,14 @@ public class FileTest {
     @Test
     public void testFileToDatabase(){
         codeTask.fileToDatabase(crawlerConfig.getCodeunzipPath());
+    }
+
+    @Test
+    public void testPath() throws IOException{
+        String[] files = "D:\\unzipDir\\github\\Java\\agileorbit-cookbooks\\agileorbit-cookbooks\\java-master\\recipes\\set_attributes_from_version.rb".split("\\\\");
+        String path = "D:\\unzipDir\\github\\Java\\TheAlgorithms\\TheAlgorithms\\Java-master\\Misc";
+        Path file = Paths.get(path,"heap_sort.java");
+        int startindex = crawlerConfig.getCodeunzipPath().split("\\\\").length - 1;
+        System.out.println(file.subpath(startindex,file.getNameCount()));
     }
 }
