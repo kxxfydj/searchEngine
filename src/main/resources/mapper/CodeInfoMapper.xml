@@ -11,6 +11,7 @@
         <result column="stars" jdbcType="INTEGER" property="stars"/>
         <result column="gitPath" jdbcType="VARCHAR" property="gitPath"/>
         <result column="repositoryId" jdbcType="INTEGER" property="repositoryId"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
     </resultMap>
 
     <insert id="batchInsert" parameterType="java.util.List">
@@ -21,7 +22,8 @@
         filePath,
         stars,
         gitPath,
-        repositoryId) VALUES
+        repositoryId,
+        author) VALUES
         <foreach collection="list" item="codeInfo" separator=",">
             (
             #{codeInfo.projectName,jdbcType=VARCHAR},
@@ -31,7 +33,8 @@
             #{codeInfo.filePath,jdbcType=VARCHAR},
             #{codeInfo.stars,jdbcType=INTEGER},
             #{codeInfo.gitPath,jdbcType=VARCHAR},
-            #{codeInfo.repositoryId,jdbcType=INTEGER}
+            #{codeInfo.repositoryId,jdbcType=INTEGER},
+            #{codeInfo.author,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

@@ -23,6 +23,16 @@ public class CodeInfo {
     private int stars;
     //git repository path
     private String gitPath;
+    //the project author
+    private String author;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
     public int getId() {
         return id;

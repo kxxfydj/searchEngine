@@ -163,7 +163,7 @@
             (
             #{path,jdbcType=VARCHAR},
             #{body,jdbcType=VARCHAR},
-            #{item.codeInfoId,jdbcType=INTEGER},
+            #{codeInfoId,jdbcType=INTEGER},
             #{fatherPath,jdbcType=VARCHAR},
             #{enabled,jdbcType=TINYINT}
             )

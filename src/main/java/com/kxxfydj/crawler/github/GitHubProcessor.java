@@ -88,7 +88,8 @@ public class GitHubProcessor extends CodeProcessor {
         String language = (String) page.getRequest().getExtra("language");
 
         Document document = page.getHtml().getDocument();
-        String projectName = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
+        String projectName = document.selectFirst("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > strong > a").text();
+        String author = document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > h1 > span.author > a").first().text();
         String description = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.js-repo-meta-container > div.repository-meta.mb-0.js-repo-meta-edit.js-details-container > div > span").first().text();
         int stars = NumberFormatUtil.formatInt(document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > ul > li:nth-child(2) > a.social-count.js-social-count").text());
         String gitPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.clone-options.https-clone-options > div > input").first().attr("value");
@@ -98,6 +99,7 @@ public class GitHubProcessor extends CodeProcessor {
         codeInfo.setDescription(description);
         codeInfo.setLanguage(language);
         codeInfo.setProjectName(projectName);
+        codeInfo.setAuthor(author);
         codeInfo.setStars(stars);
         codeInfo.setRepository(CrawlerTypeEnum.GITHUB.getType());
         codeInfo.setGitPath(gitPath);

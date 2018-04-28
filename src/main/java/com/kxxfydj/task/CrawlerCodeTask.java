@@ -33,9 +33,6 @@ public class CrawlerCodeTask {
     private CrawlerConfig crawlerConfig;
 
     @Autowired
-    private CodeContentService codeContentService;
-
-    @Autowired
     private Worker worker;
 
     @Autowired
@@ -56,50 +53,8 @@ public class CrawlerCodeTask {
             crawlerTaskList.add(crawlerTask);
         }
         worker.start(crawlerTaskList);
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
-        fileToDatabase(crawlerConfig.getCodeunzipPath());
+
     }
 
-    public void fileToDatabase(String filePath){
-        List<CodeContent> codeContentList = new ArrayList<>();
-        File fatherFile = new File(filePath);
-        if(fatherFile.isFile() && !fatherFile.getAbsolutePath().endsWith(".zip")){
-            handlerFileToDatabase(fatherFile,codeContentList,true);
-        }else if(fatherFile.isDirectory()){
-            handlerLeafFile(fatherFile,codeContentList);
-        }
-//        codeContentService.saveOrUpdate(codeContentList);
-    }
 
-    private void handlerLeafFile(File file,List<CodeContent> codeContentList){
-        if(file.isDirectory()) {
-            File[] fileChildren = file.listFiles();
-            for (File childFile : fileChildren) {
-                if (childFile.isDirectory()) {
-                    handlerLeafFile(childFile, codeContentList);
-                } else {
-                    handlerFileToDatabase(childFile, codeContentList, false);
-                }
-            }
-        }
-    }
-
-    private void handlerFileToDatabase(File file,List<CodeContent> codeContentList,boolean isRoot){
-        try(FileReader reader = new FileReader(file)){
-            String fileString = IOUtils.toString(reader);
-            CodeContent codeContent = new CodeContent();
-            codeContent.setBody(fileString);
-            codeContent.setEnabled(true);
-            codeContent.setPath(file.getAbsolutePath());
-            if(!isRoot){
-                codeContent.setFatherPath(file.getParent());
-            }
-            codeContentService.saveOrUpdate(codeContent);
-            codeContentList.add(codeContent);
-        }catch (IOException e){
-            logger.error("文件到数据库时，文件读取出错！ 文件名：{}", file.getAbsolutePath(),e.getMessage(), e);
-        }catch (Exception e){
-            logger.error("数据保存到数据库出错！文件名：{}", file.getAbsolutePath(),e.getMessage(),e);
-        }
-    }
 }

@@ -1,4 +1,5 @@
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
+import com.kxxfydj.service.UnzipService;
 import com.kxxfydj.task.CrawlerCodeTask;
 import com.kxxfydj.utils.FileUtils;
 import org.junit.Test;
@@ -27,7 +28,8 @@ public class FileTest {
     CrawlerConfig crawlerConfig;
 
     @Autowired
-    CrawlerCodeTask codeTask;
+    UnzipService unzipService;
+
     @Test
     public void test(){
         FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
@@ -35,7 +37,8 @@ public class FileTest {
 
     @Test
     public void testFileToDatabase(){
-        codeTask.fileToDatabase(crawlerConfig.getCodeunzipPath());
+        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
+        unzipService.fileToDatabase(crawlerConfig.getCodeunzipPath());
     }
 
     @Test
