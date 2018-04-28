@@ -1,21 +1,17 @@
 package com.kxxfydj.crawler;
 
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
-import com.kxxfydj.crawlerConfig.annotation.Crawl;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.entity.Proxy;
 import com.kxxfydj.proxy.ProxyCenter;
-import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.utils.ApplicationContextUtils;
 import com.kxxfydj.utils.JsoupRequestData;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.ContextLoader;
 import us.codecraft.webmagic.Site;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 /**
  * create by kaiming_xu on 2017/9/5
@@ -30,21 +26,36 @@ public abstract class CrawlerBase implements Crawler {
 
     protected CrawlerTask crawlerTask;
 
-    protected Site site = Site.me()
-            .setSleepTime(500);
+    protected Site site;
 
     public CrawlerTask getCrawlerTask() {
         return crawlerTask;
     }
 
+    public CrawlerBase(){
+//        site = Site.me().setSleepTime();
+    }
+
+    @Override
+    public void run() {
+        initSite();
+        crawler();
+    }
+
+    private void initSite(){
+        site = Site.me().
+                setSleepTime(crawlerConfig.getThreadPoolIdleSleepTime());
+    }
+
     @Override
     public void setCrawlerTask(CrawlerTask crawlerTask) {
         this.crawlerTask = crawlerTask;
+        this.condition = crawlerTask.getUrlCondition();
     }
 
     protected void setProxy(){
         ProxyCenter proxyCenter = ApplicationContextUtils.getBean(ProxyCenter.class);
-        if(proxyCenter != null){
+        if(proxyCenter != null && crawlerConfig.isProxySwitch()){
             java.net.Proxy proxy = proxyCenter.availableProxy();
             InetSocketAddress socketAddress = (InetSocketAddress) proxy.address();
             HttpHost httpHost = new HttpHost(socketAddress.getHostName(),socketAddress.getPort());
@@ -52,6 +63,12 @@ public abstract class CrawlerBase implements Crawler {
         }else {
             logger.warn("没有使用代理进行爬取！");
         }
+    }
+
+    protected void setFiddlerProxy(){
+        JsoupRequestData jsoupRequestData = new JsoupRequestData();
+        jsoupRequestData.setFiddlerProxy();
+        setProxy(jsoupRequestData);
     }
 
     protected void setProxy(JsoupRequestData jsoupRequestData){

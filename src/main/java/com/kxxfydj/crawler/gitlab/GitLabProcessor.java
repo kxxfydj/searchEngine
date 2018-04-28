@@ -9,6 +9,7 @@ import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.NumberFormatUtil;
 import com.kxxfydj.utils.RequestUtil;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -51,13 +52,16 @@ public class GitLabProcessor extends CodeProcessor {
             String link = tagA.attr("href");
             Element tagSpan = item.child(2).child(1);
             int stars = NumberFormatUtil.formatInt(tagSpan.text());
-            if (stars < 10) {
+            if (stars < 200) {
                 stop = true;
                 break;
             }
-            totalCount.incrementAndGet();
-            Request request = RequestUtil.createGetRequest(link, CommonTag.NEXT_PAGE);
-            page.addTargetRequest(request);
+            if(totalCount.incrementAndGet() <= crawlerTask.getFilterCount()) {
+                Request request = RequestUtil.createGetRequest(link, CommonTag.NEXT_PAGE);
+                page.addTargetRequest(request);
+            }else {
+                return;
+            }
         }
         if (!stop) {
             Element next = document.selectFirst("#content-body > div.js-projects-list-holder > div > ul > li > a");
@@ -68,7 +72,7 @@ public class GitLabProcessor extends CodeProcessor {
     }
 
     @Override
-    protected Pair<String, String> parseNextPage(Page page) {
+    protected Triplet<String, String, CodeInfo> parseNextPage(Page page) {
         if (page == null) {
             return null;
         }
@@ -85,13 +89,19 @@ public class GitLabProcessor extends CodeProcessor {
         codeInfo.setGitPath(gitPath);
         codeInfo.setProjectName(projectName);
         codeInfo.setDescription(description);
-        codeInfoList.add(codeInfo);
 
         String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
         codeInfo.setFilePath(filePath);
 
+        return new Triplet<>(filePath,downloadPath, codeInfo);
+    }
+
+    @Override
+    protected void afterDownload(boolean isSuccess, CodeInfo codeInfo) {
+        if(isSuccess){
+            codeInfoList.add(codeInfo);
+        }
         handlerdCount.incrementAndGet();
-        return new Pair<>(filePath,downloadPath);
     }
 
     @Override

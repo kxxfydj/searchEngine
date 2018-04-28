@@ -9,4 +9,5 @@ import com.kxxfydj.entity.CrawlerTask;
 public interface Crawler extends Runnable{
     void setCrawlerConfig(CrawlerConfig crawlerConfig);
     void setCrawlerTask(CrawlerTask crawlerTask);
+    void crawler();
 }

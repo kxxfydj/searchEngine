@@ -10,8 +10,19 @@ public class CodeRepository {
     private String repositoryName;
     //the count of projects
     private long projectCount;
-    // the language of project
-    private String language;
+    // the condition of crawler
+    private int filterCount;
+    // the condition of url, conbine the url
+
+    private String urlCondition;
+
+    public String getUrlCondition() {
+        return urlCondition;
+    }
+
+    public void setUrlCondition(String urlCondition) {
+        this.urlCondition = urlCondition;
+    }
 
     public int getId() {
         return id;
@@ -37,11 +48,11 @@ public class CodeRepository {
         this.projectCount = projectCount;
     }
 
-    public String getLanguage() {
-        return language;
+    public int getFilterCount() {
+        return filterCount;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setFilterCount(int filterCount) {
+        this.filterCount = filterCount;
     }
 }

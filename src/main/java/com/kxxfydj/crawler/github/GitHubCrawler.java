@@ -8,8 +8,12 @@ import com.kxxfydj.crawlerConfig.MyHttpClientDownloader;
 import com.kxxfydj.crawlerConfig.MyQueueScheduler;
 import com.kxxfydj.crawlerConfig.annotation.Crawl;
 import com.kxxfydj.utils.RequestUtil;
+import com.kxxfydj.utils.URLUtil;
+import org.apache.http.client.utils.URLEncodedUtils;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
+
+import java.net.URLEncoder;
 
 /**
  * create by kaiming_xu on 2017/9/2
@@ -18,14 +22,16 @@ import us.codecraft.webmagic.Spider;
 public class GitHubCrawler extends CrawlerBase {
 
     @Override
-    public void run() {
+    public void crawler() {
 
         site = site.addHeader("Referer", "https://github.com/")
-                .setTimeOut(15 * 1000)
                 .addHeader("Host", "github.com");
 
         super.setProxy();
-        Request request = RequestUtil.createGetRequest("https://github.com/search?utf8=%E2%9C%93&q=" + this.condition + "&type=", CommonTag.FIRST_PAGE);
+        super.setFiddlerProxy();
+        String url = URLUtil.encode("https://github.com/search?utf8=%E2%9C%93&q=" + this.condition + "&type=","UTF-8");
+        url = url.replaceAll("%2B","+");
+        Request request = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
 
         Spider spider = Spider
                 .create(new GitHubProcessor(site, this.crawlerTask))

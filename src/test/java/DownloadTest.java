@@ -70,13 +70,13 @@ public class DownloadTest {
 //            logger.error(e.getMessage(),e);
 //        }
 //        System.out.println(System.getProperty("user.dir"));
-//        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
-//            CreateFileUtil.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt","sdjlfsdfdsfs");
-        Class<GitLabCrawler> clazz = GitLabCrawler.class;
-        Constructor<?>[] constructors = clazz.getConstructors();
-        for(Constructor<?> constructor : constructors){
-            System.out.println(constructor.getParameterCount());
-        }
+        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
+            CreateFileUtil.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt","sdjlfsdfdsfs");
+//        Class<GitLabCrawler> clazz = GitLabCrawler.class;
+//        Constructor<?>[] constructors = clazz.getConstructors();
+//        for(Constructor<?> constructor : constructors){
+//            System.out.println(constructor.getParameterCount());
+//        }
 
     }
 
@@ -93,10 +93,10 @@ public class DownloadTest {
         requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
         jsoupRequestData.setFiddlerProxy();
+        jsoupRequestData.setTimeOut(50*1000);
         jsoupRequestData.setHeaders(requestHeaderMap);
-//            apacheHttpRequestData.setFiddlerProxy();
-        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-        CreateFileUtil.generateFile(filePath, binaryData);
+//        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+//        CreateFileUtil.generateFile(filePath, binaryData);
     }
 
     @Test

@@ -6,20 +6,15 @@
 
     <mvc:annotation-driven />
 
-    <mvc:resources location="/WEB-INF/pages/CodeSearch/static/" mapping="/static/**"/>
+    <mvc:resources location="/WEB-INF/pages/search/static/" mapping="search/static/**"/>
 
-    <mvc:view-controller path="/index" view-name="/CodeSearch/static/html/searchcode.html"/>
+    <mvc:view-controller path="/" view-name="/search/static/html/searchcode.html"/>
+    <mvc:view-controller path="/index" view-name="/search/static/html/searchcode.html"/>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/pages/"/>
 
-    <!--<mvc:resources location="/WEB-INF/pages/png/" mapping="/image/**"/>-->
     <mvc:default-servlet-handler />
 
-    <!--<context:component-scan base-package="com.kaikai" />-->
-
-    <!--<mvc:view-controller path="/" view-name="/home/index"/>-->
-
-    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/pages/" p:suffix=".jsp" />-->
-
+    <context:component-scan base-package="com.kxxfydj.view" />
 
 </beans>

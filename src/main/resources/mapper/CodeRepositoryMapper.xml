@@ -4,11 +4,12 @@
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeRepository">
         <result column="repositoryName" jdbcType="VARCHAR" property="repositoryName"/>
         <result column="projectCount" jdbcType="INTEGER" property="projectCount"/>
-        <result column="condition" jdbcType="VARCHAR" property="condition"/>
+        <result column="filterCount" jdbcType="INTEGER" property="filterCount"/>
+        <result column="urlCondition" jdbcType="VARCHAR" property="urlCondition"/>
     </resultMap>
 
     <select id="selectAll" resultMap="baseResultMap">
-        SELECT * from coderepositoty;
+        SELECT * from coderepository;
     </select>
 
     <select id="selectByName" resultMap="baseResultMap">
@@ -19,30 +20,36 @@
         INSERT INTO coderepository
         <trim prefix = "(" suffix=")" suffixOverrides=",">
             repositoryName,projectCount,
-            <if test="condition != null">
-                condition
+            <if test="filterCount != null">
+                filterCount,
+            </if>
+            <if test="urlCondition != null">
+                urlCondition
             </if>
         </trim>
         <trim prefix="values(" suffix=")" suffixOverrides=",">
             #{repositoryName,jdbcType=VARCHAR},
             #{projectCount,jdbcType=INTEGER},
-            <if test="condition != null">
-                #{condition,jdbcType=VARCHAR}
+            <if test="filterCount != null">
+                #{filterCount,jdbcType=INTEGER},
+            </if>
+            <if test="urlCondition != null">
+                #{urlCondition,jdbcType=VARCHAR}
             </if>
         </trim>
     </insert>
 
     <select id="selectByNameAndCondition" resultMap="baseResultMap">
         select * from coderepository where repositoryName = #{repositoryName}
-        <if test="condition != null">
-            and condition = #{condition}
+        <if test="urlCondition != null">
+            and urlCondition = #{urlCondition}
         </if>
     </select>
 
     <update id="updateCodeRepository" parameterType="com.kxxfydj.entity.CodeRepository">
         UPDATE coderepository SET projectCount = #{projectCount} where repositoryName = #{repositoryName}
-         <if test="condition != null">
-             and condition = #{condition}
+         <if test="urlCondition != null">
+             and urlCondition = #{urlCondition}
          </if>
     </update>
 </mapper>

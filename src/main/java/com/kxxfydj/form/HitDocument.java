@@ -10,7 +10,25 @@ public class HitDocument {
 
     private String path;
 
+    private String gitPath;
 
+    private String projectName;
+
+    public String getGitPath() {
+        return gitPath;
+    }
+
+    public void setGitPath(String gitPath) {
+        this.gitPath = gitPath;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
 
     public String getFileName() {
         return fileName;

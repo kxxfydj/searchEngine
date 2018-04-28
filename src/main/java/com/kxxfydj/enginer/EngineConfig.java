@@ -20,6 +20,10 @@ public class EngineConfig {
 
     public static final String PATH = "path";
 
+    public static final String PROJECTNAME = "projectName";
+
+    public static final String GITPATH = "gitPath";
+
     @Value("#{settings['crawler.codefile.path']}")
     private String zipFilePath;
 

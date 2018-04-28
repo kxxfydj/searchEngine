@@ -14,18 +14,19 @@ import us.codecraft.webmagic.Spider;
 /**
  * Created by kxxfydj on 2018/3/24.
  */
-@Crawl(crawlerName = "gitlab")
+//@Crawl(crawlerName = "gitlab")
 public class GitLabCrawler extends CrawlerBase {
 
     @Override
-    public void run() {
+    public void crawler() {
         site = site.addHeader("Referer", "https://gitlab.com/explore/projects/trending")
                 .setTimeOut(15 * 1000)
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36")
                 .addHeader("Host", "gitlab.com");
 
-        super.setProxy();
-        Request request = RequestUtil.createGetRequest("https://gitlab.com/explore/projects/starred", CommonTag.FIRST_PAGE);
+//        super.setProxy();
+        String url = "https://gitlab.com/explore/projects/" + crawlerTask.getUrlCondition();
+        Request request = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
 
         Spider spider = Spider
                 .create(new GitLabProcessor(site,this.crawlerTask))

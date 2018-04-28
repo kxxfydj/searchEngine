@@ -4,6 +4,7 @@
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeContent">
         <id column="path" jdbcType="VARCHAR" property="path"/>
         <result column="body" jdbcType="VARCHAR" property="body"/>
+        <result column="codeinfoId" jdbcType="INTEGER" property="codeInfoId"/>
         <result column="addTime" jdbcType="TIMESTAMP" property="addTime"/>
         <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="fatherPath" jdbcType="VARCHAR" property="fatherPath"/>
@@ -35,6 +36,9 @@
             <if test="body != null">
                 body,
             </if>
+            <if test="codeInfoId != null">
+                codeinfoId,
+            </if>
             <if test="fatherPath != null">
                 fatherPath,
             </if>
@@ -49,6 +53,9 @@
             <if test="body != null">
                 #{body},
             </if>
+            <if test="codeInfoId != null">
+                #{codeInfoId},
+            </if>
             <if test="fatherPath != null">
                 #{fatherPath}
             </if>
@@ -61,6 +68,7 @@
         INSERT into codecontent(
         path,
         body,
+        codeinfoId,
         fatherPath,
         enabled
         )
@@ -69,6 +77,7 @@
             (
             #{item.path,jdbcType=VARCHAR},
             #{item.body,jdbcType=VARCHAR},
+            #{item.codeInfoId,jdbcType=INTEGER},
             #{item.fatherPath,jdbcType=VARCHAR},
             #{item.enabled,jdbcType=TINYINT},
             )
@@ -115,11 +124,12 @@
     </update>
 
     <insert id="saveOrUpdate" parameterType="java.util.List">
-        INSERT INTO codecontent(path,body,fatherPath,enabled) values
+        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,enabled) values
         <foreach collection="list" item="item" separator=",">
             (
             #{item.path,jdbcType=VARCHAR},
             #{item.body,jdbcType=VARCHAR},
+            #{item.codeInfoId,jdbcType=INTEGER},
             #{item.fatherPath,jdbcType=VARCHAR},
             #{item.enabled,jdbcType=TINYINT}
             )
@@ -149,10 +159,11 @@
     </insert>
 
     <insert id="saveOrUpdateOne" parameterType="com.kxxfydj.entity.CodeContent">
-        INSERT INTO codecontent(path,body,fatherPath,enabled) values
+        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,enabled) values
             (
             #{path,jdbcType=VARCHAR},
             #{body,jdbcType=VARCHAR},
+            #{item.codeInfoId,jdbcType=INTEGER},
             #{fatherPath,jdbcType=VARCHAR},
             #{enabled,jdbcType=TINYINT}
             )

@@ -1,9 +1,12 @@
 package com.kxxfydj.proxy;
 
+import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.entity.Proxy;
 import com.kxxfydj.mapper.ProxyMapper;
 import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.ProxyService;
+import com.kxxfydj.task.CheckProxyTask;
+import com.kxxfydj.task.CrawlerProxyTask;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +28,17 @@ public class ProxyCenter {
 
     private static List<Proxy> usedProxyList = new ArrayList<>();
 
-    private static final String CACHE_KEY = "proxyList";
-
     @Autowired
-    private RedisUtil<String, Proxy> redisUtil;
+    private RedisUtil redisUtil;
 
     @Autowired
     private ProxyService proxyService;
+
+    @Autowired
+    private CrawlerProxyTask crawlerProxyTask;
+
+    @Autowired
+    private CheckProxyTask checkProxyTask;
 
     static {
         typeMap.put("http", java.net.Proxy.Type.HTTP);
@@ -40,11 +47,18 @@ public class ProxyCenter {
     }
 
     public synchronized List<Proxy> getAllCachedProxies(){
-        return redisUtil.lGet(CACHE_KEY,0,-1);
+        return redisUtil.lGet(RedisKeys.PROXYLIST.getKey(),0,-1);
     }
 
     public synchronized java.net.Proxy availableProxy() {
-        Proxy targetProxy = redisUtil.lLeftPop(CACHE_KEY);
+        Proxy targetProxy = redisUtil.lLeftPop(RedisKeys.PROXYLIST.getKey());
+
+        if(targetProxy == null){
+            logger.info("redis 代理池无可用代理！开始爬取西刺代理，并检测可用性！");
+            crawlerProxyTask.crawlerProxy();
+            checkProxyTask.checkDatabase();
+            return null;
+        }
 
         //put the target proxy to the usedProxyList
         usedProxyList.add(targetProxy);
@@ -63,11 +77,11 @@ public class ProxyCenter {
      */
     public synchronized void putAllProxies(List<Proxy> proxyList){
         proxyList.removeAll(usedProxyList);
-        redisUtil.lSet(CACHE_KEY,proxyList);
+        redisUtil.lSet(RedisKeys.PROXYLIST.getKey(),proxyList);
     }
 
     public synchronized void clearProxyCache(){
-        redisUtil.del(CACHE_KEY);
+        redisUtil.del(RedisKeys.PROXYLIST.getKey());
     }
 
     public synchronized void clearThenPut(List<Proxy> proxyList){
@@ -104,7 +118,7 @@ public class ProxyCenter {
             }
             proxy.setEnabled(false);
             removedList.add(proxy);
-            redisUtil.lRemove(CACHE_KEY,0,proxy);
+            redisUtil.lRemove(RedisKeys.PROXYLIST.getKey(),0,proxy);
         }
         //update the database
         proxyService.updateProxies(removedList);

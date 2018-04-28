@@ -22,7 +22,7 @@ import java.util.Map;
 @Crawl(crawlerName = "xici")
 public class XiciCrawler extends CrawlerBase {
     @Override
-    public void run() {
+    public void crawler() {
         Map<String,String> requestHeader = HeaderUtils.initGetHeaders("www.xicidaili.com","www.baidu.com","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
         requestHeader.forEach((key,value) -> site = site.addHeader(key,value));
         site = site.setTimeOut(15*1000);

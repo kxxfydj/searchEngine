@@ -31,7 +31,7 @@ public class SearchIndex {
     private static final Logger logger = LoggerFactory.getLogger(SearchIndex.class);
 
     @Autowired
-    private RedisUtil<String,HitDocument> redisUtil;
+    private RedisUtil redisUtil;
 
     @Autowired
     private EngineConfig engineConfig;
@@ -59,6 +59,8 @@ public class SearchIndex {
                 document.setFileName(hitDoc.get(EngineConfig.FILENAME));
                 document.setContent(hitDoc.get(EngineConfig.CONTENT));
                 document.setPath(hitDoc.get(EngineConfig.PATH));
+                document.setProjectName(hitDoc.get(EngineConfig.PROJECTNAME));
+                document.setGitPath(hitDoc.get(EngineConfig.GITPATH));
 
                 documentList.add(document);
             }

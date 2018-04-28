@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by kxxfydj on 2018/3/25.
  */
@@ -17,8 +20,11 @@ public class CrawlerProxyTask {
 
     @Scheduled(cron = "0 0 /3 * * ?")
     public void crawlerProxy(){
+        List<CrawlerTask> crawlerTaskList = new ArrayList<>();
         CrawlerTask crawlerTask = new CrawlerTask();
+
         crawlerTask.setCrawlerName("xici");
-        worker.start(crawlerTask);
+        crawlerTaskList.add(crawlerTask);
+        worker.start(crawlerTaskList);
     }
 }

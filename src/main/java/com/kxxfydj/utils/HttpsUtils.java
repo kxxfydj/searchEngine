@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,31 +34,50 @@ public class HttpsUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpsUtils.class);
 
-    public static String get(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies) {
-        return get(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout());
+    public static String get(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies){
+        if(jsoupRequestData.getTimeOut() == -1){
+            return get(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout());
+        }else {
+            return get(url, jsoupRequestData, cookies, jsoupRequestData.getTimeOut());
+        }
+
     }
 
     public static Document getDocument(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies) {
-        Connection connection = constructConnection(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout(), HttpsUtils.GET);
+        Connection connection = null;
+        if(jsoupRequestData.getTimeOut() == -1){
+            connection = constructConnection(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout(), HttpsUtils.GET);
+        }else {
+            connection = constructConnection(url, jsoupRequestData, cookies, jsoupRequestData.getTimeOut(), HttpsUtils.GET);
+        }
         return getDocumentFromRequest(connection, jsoupRequestData);
     }
 
-    public static byte[] getBytes(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies) {
-        return getBytes(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout());
+    public static byte[] getBytes(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies){
+        if(jsoupRequestData.getTimeOut() == -1) {
+            return getBytes(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout());
+        }else {
+            return getBytes(url, jsoupRequestData, cookies, jsoupRequestData.getTimeOut());
+        }
     }
 
     public static Document post(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies) {
-        Connection connection = constructConnection(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout(), HttpsUtils.POST);
+        Connection connection;
+        if(jsoupRequestData.getTimeOut() == -1) {
+            connection = constructConnection(url, jsoupRequestData, cookies, JsoupRequestData.getDefaultTimeout(), HttpsUtils.POST);
+        }else {
+            connection = constructConnection(url, jsoupRequestData, cookies, jsoupRequestData.getTimeOut(), HttpsUtils.POST);
+        }
         return getDocumentFromRequest(connection, jsoupRequestData);
     }
 
-    public static String get(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies, int timeOut) {
+    public static String get(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies, int timeOut){
         Connection connection = constructConnection(url, jsoupRequestData, cookies, timeOut, HttpsUtils.GET);
         return getHtmlFromRequest(connection, jsoupRequestData);
 
     }
 
-    public static byte[] getBytes(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies, int timeout) {
+    public static byte[] getBytes(String url, JsoupRequestData jsoupRequestData, Map<String, String> cookies, int timeout){
         Connection connection = constructConnection(url, jsoupRequestData, cookies, timeout, HttpsUtils.GET);
         return getBytesFromRequest(connection, jsoupRequestData);
     }
@@ -127,7 +147,15 @@ public class HttpsUtils {
 
     private static byte[] getBytesFromRequest(Connection connection, JsoupRequestData jsoupRequestData) {
         try {
-            Connection.Response response = connection.ignoreContentType(true).execute();
+            Connection.Response response;
+            long timestart = System.currentTimeMillis();
+            try {
+                response = connection.ignoreContentType(true).execute();
+            }catch (Exception e){
+                long timeend = System.currentTimeMillis();
+                logger.error("下载出现未知异常!耗时：{}毫秒",timeend - timestart,e.getMessage(),e);
+                return null;
+            }
             int statusCode = response.statusCode();
             if (!jsoupRequestData.getStatusCodeSet().contains(statusCode)) {
                 throw new ResponseStatusException("the response status code is not accepted! code: " + statusCode);

@@ -24,6 +24,14 @@ public class CodeInfo {
     //git repository path
     private String gitPath;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getRepositoryId() {
         return repositoryId;
     }

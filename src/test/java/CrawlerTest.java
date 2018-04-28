@@ -1,3 +1,4 @@
+import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.crawler.Worker;
 import com.kxxfydj.crawler.xiciProxy.XiciCrawler;
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
@@ -6,6 +7,9 @@ import com.kxxfydj.proxy.ProxyCenter;
 import com.kxxfydj.proxy.ProxyCheck;
 import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.ProxyService;
+import com.kxxfydj.task.CheckProxyTask;
+import com.kxxfydj.task.CrawlerCodeTask;
+import com.kxxfydj.task.CrawlerProxyTask;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +30,19 @@ public class CrawlerTest {
     Worker worker;
 
     @Autowired
-    RedisUtil<String, Proxy> redisUtil;
+    RedisUtil redisUtil;
 
     @Autowired
     ProxyCenter proxyCenter;
+
+    @Autowired
+    CrawlerCodeTask task;
+
+    @Autowired
+    CrawlerProxyTask crawlerProxyTask;
+
+    @Autowired
+    CheckProxyTask checkProxyTask;
 
     @Autowired
     private CrawlerConfig crawlerConfig;
@@ -44,14 +57,13 @@ public class CrawlerTest {
 //        worker.start();
 //        redisUtil.lSet("testKey","testValue");
 //        redisUtil.set("kaikai","name");
+        task.CrawlerCode();
     }
 
     @Test
     public void crawlerProxy() {
-        XiciCrawler xiciCrawler = new XiciCrawler();
-        xiciCrawler.setCrawlerConfig(crawlerConfig);
-//        new Thread(xiciCrawler).start();
-        xiciCrawler.run();
+//        crawlerProxyTask.crawlerProxy();
+        checkProxyTask.checkDatabase();
     }
 
     @Test
@@ -60,7 +72,7 @@ public class CrawlerTest {
 
 //        redisUtil.lSet("proxyList",proxyList);
 
-        List<Proxy> proxies = redisUtil.lGet("proxyList", 0, -1);
+        List<Proxy> proxies = redisUtil.lGet(RedisKeys.PROXYLIST.getKey(), 0, -1);
         System.out.println(proxies);
     }
 

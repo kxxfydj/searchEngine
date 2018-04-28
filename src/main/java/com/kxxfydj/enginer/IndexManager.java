@@ -1,6 +1,9 @@
 package com.kxxfydj.enginer;
 
+import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.entity.CodeContent;
+import com.kxxfydj.entity.CodeInfo;
+import com.kxxfydj.redis.RedisUtil;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -36,7 +39,7 @@ public class IndexManager {
         this.engineConfig = engineConfig;
     }
 
-    public void createIndex(List<CodeContent> codeContentList) {
+    public void createIndex(List<CodeContent> codeContentList, RedisUtil redisUtil) {
 
         Path indexFile = Paths.get(engineConfig.getIndexFile());
 
@@ -63,9 +66,12 @@ public class IndexManager {
                 }
                 int startindex = engineConfig.getUnzipFilePath().split("\\\\").length - 1;
                 Path filePath = Paths.get(first, others);
+                CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
                 document.add(new TextField(EngineConfig.FILENAME, filePath.getFileName().toString(), Field.Store.YES));
                 document.add(new TextField(EngineConfig.PATH, filePath.subpath(startindex, filePath.getNameCount()).toString(), Field.Store.YES));
                 document.add(new TextField(EngineConfig.CONTENT, codeContent.getBody(), Field.Store.YES));
+                document.add(new TextField(EngineConfig.PROJECTNAME, codeInfo.getProjectName(),Field.Store.YES));
+                document.add(new TextField(EngineConfig.GITPATH,codeInfo.getGitPath(),Field.Store.YES));
 
                 indexWriter.addDocument(document);
 

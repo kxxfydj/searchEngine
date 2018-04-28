@@ -46,4 +46,9 @@ public class FileTest {
         int startindex = crawlerConfig.getCodeunzipPath().split("\\\\").length - 1;
         System.out.println(file.subpath(startindex,file.getNameCount()));
     }
+
+    @Test
+    public void fileToDataBase(){
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.kxxfydj.service.impl;
 
+import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.enginer.SearchIndex;
 import com.kxxfydj.form.HitDocument;
 import com.kxxfydj.redis.RedisUtil;
@@ -25,7 +26,7 @@ public class SearchServiceImp implements SearchService {
     private SearchIndex searchIndex;
 
     @Autowired
-    RedisUtil<String,HitDocument> redisUtil;
+    RedisUtil redisUtil;
 
     @Override
     public List<HitDocument> defaultSearchContent(String content) {
@@ -34,14 +35,13 @@ public class SearchServiceImp implements SearchService {
     }
 
     @Override
-    public List<HitDocument> fieldSearch(String filed, String content) {
-        String clause = filed + ":" + content;
+    public List<HitDocument> fieldSearch(String clause) {
         return handlerSearch(clause);
     }
 
     private List<HitDocument> handlerSearch(String clause){
-        List<HitDocument> documentList = redisUtil.lGet("documentList" + clause,0,-1);
-        if(documentList != null || !documentList.isEmpty()){
+        List<HitDocument> documentList = redisUtil.lGet(RedisKeys.DOCUMENTLIST.getKey() + ":" + clause,0,-1);
+        if( !documentList.isEmpty()){
             logger.info("查询语句有缓存，从缓存中读取数据");
             return documentList;
         }

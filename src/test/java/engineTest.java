@@ -37,7 +37,7 @@ public class engineTest {
     private static final Logger logger = LoggerFactory.getLogger(engineTest.class);
 
     @Autowired
-    private RedisUtil<String,List<HitDocument>> redisUtil;
+    private RedisUtil redisUtil;
 
     @Autowired
     private EngineConfig engineConfig;
@@ -52,7 +52,7 @@ public class engineTest {
     public void testIndexFile() {
         List<CodeContent> codeContentList = codeContentService.getAllFiles();
         IndexManager indexManager = new IndexManager(engineConfig);
-        indexManager.createIndex(codeContentList);
+        indexManager.createIndex(codeContentList,redisUtil);
     }
 
     @Test

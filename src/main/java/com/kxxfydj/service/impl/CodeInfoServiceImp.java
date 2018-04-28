@@ -40,4 +40,9 @@ public class CodeInfoServiceImp implements CodeInfoService{
     public int cleanCodeInfo() {
         return codeInfoMapper.truncateTable();
     }
+
+    @Override
+    public List<CodeInfo> getAllCodeInfo() {
+        return codeInfoMapper.selectAll();
+    }
 }

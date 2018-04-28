@@ -12,15 +12,12 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,14 +45,17 @@ public class CrawlerCodeTask {
     public void CrawlerCode(){
 
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getAllRepostitory();
+        List<CrawlerTask> crawlerTaskList = new ArrayList<>();
 
         for(CodeRepository codeRepository: codeRepositoryList) {
             CrawlerTask crawlerTask = new CrawlerTask();
             crawlerTask.setCrawlerName(codeRepository.getRepositoryName());
             crawlerTask.setCodeFilePath(crawlerConfig.getCodezipPath());
-            worker.start(crawlerTask);
+            crawlerTask.setUrlCondition(codeRepository.getUrlCondition());
+            crawlerTask.setFilterCount(codeRepository.getFilterCount());
+            crawlerTaskList.add(crawlerTask);
         }
-
+        worker.start(crawlerTaskList);
         FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
         fileToDatabase(crawlerConfig.getCodeunzipPath());
     }

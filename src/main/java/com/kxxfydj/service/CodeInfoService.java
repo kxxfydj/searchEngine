@@ -11,6 +11,7 @@ public interface CodeInfoService {
     int saveCodeInfo(List<CodeInfo> codeInfoList);
     List<CodeInfo> getCodeInfoByProjectName(String projectName);
     List<CodeInfo> getCodeInfoByProjectNameAndLanguage(String projectName,String language);
+    List<CodeInfo> getAllCodeInfo();
     CodeInfo getCodeInfoByGitPath(String gitPath);
     int cleanCodeInfo();
 }

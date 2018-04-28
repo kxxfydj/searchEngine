@@ -22,6 +22,12 @@ public class JsoupRequestData {
      * 默认超时毫秒数
      */
     private static final int DEFAULT_TIMEOUT = 15000;
+
+    /**
+     * 超时毫秒数
+     */
+    private int timeOut = -1;
+
     /**
      * 请求头信息
      */
@@ -133,6 +139,13 @@ public class JsoupRequestData {
         this.proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, fiddlerSocket);
     }
 
+    public int getTimeOut() {
+        return timeOut;
+    }
+
+    public void setTimeOut(int timeOut) {
+        this.timeOut = timeOut;
+    }
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;

@@ -65,6 +65,9 @@ public class CrawlerConfig {
     @Value("#{settings['crawler.unzipfile.path']}")
     private String codeunzipPath;
 
+    @Value("#{settings['crawler.proxy.switch']}")
+    private boolean proxySwitch;
+
     private Map<String ,Class<Crawler>> supportCrawlerClazzMap = new HashMap<>();
 
     public Map<String, Class<Crawler>> getSupportCrawlerClazzMap() {
@@ -136,6 +139,14 @@ public class CrawlerConfig {
             logger.error("爬虫文件任务出现重名！请确认：{},{}",oldClazz.getName(),clazz.getName());
         }
         supportCrawlerClazzMap.put(crawlerName,clazz);
+    }
+
+    public boolean isProxySwitch() {
+        return proxySwitch;
+    }
+
+    public void setProxySwitch(boolean proxySwitch) {
+        this.proxySwitch = proxySwitch;
     }
 
     public int getThreadPoolSizeCore() {

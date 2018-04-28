@@ -2,9 +2,11 @@ package com.kxxfydj.crawlerConfig;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.common.PipelineKeys;
+import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CodeRepository;
 import com.kxxfydj.entity.Proxy;
+import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.CodeInfoService;
 import com.kxxfydj.service.CodeRepositoryService;
 import com.kxxfydj.service.ProxyService;
@@ -16,6 +18,7 @@ import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,10 +34,13 @@ public class CommonPipeline implements Pipeline {
 
     private ProxyService proxyService;
 
+    private RedisUtil redisUtil;
+
     public CommonPipeline() {
         codeInfoService = ApplicationContextUtils.getBean(CodeInfoService.class);
         codeRepositoryService = ApplicationContextUtils.getBean(CodeRepositoryService.class);
         proxyService = ApplicationContextUtils.getBean(ProxyService.class);
+        redisUtil = ApplicationContextUtils.getBean(RedisUtil.class);
     }
 
     @Override
@@ -71,6 +77,9 @@ public class CommonPipeline implements Pipeline {
         long endTime = System.currentTimeMillis();
         logger.info("更新和插入了{}条数据",rows);
         logger.info("共耗时{}毫秒",endTime - startTime);
+
+        redisUtil.lSet(RedisKeys.PROXYLIST.getKey(),proxyList);
+        logger.info("更新redis代理缓存{}条数据",proxyList.size());
     }
 
     /**
@@ -105,5 +114,13 @@ public class CommonPipeline implements Pipeline {
         long endTime = System.currentTimeMillis();
         logger.info("数据插入完成! 共插入{}条数据!", rows);
         logger.info("共耗时:{}毫秒!", endTime - startTime);
+
+        List<String> codeInfoKeys = new ArrayList<>();
+        for(CodeInfo codeInfo : codeInfoList){
+            codeInfoKeys.add(RedisKeys.CODEINFOID.getKey() + ":" + codeInfo.getId());
+        }
+
+        redisUtil.setForBatch(codeInfoKeys,codeInfoList);
+        logger.info("codeInfo对象缓存到redis中！共{}条", codeInfoKeys.size());
     }
 }

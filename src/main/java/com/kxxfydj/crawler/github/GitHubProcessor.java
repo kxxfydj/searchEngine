@@ -10,6 +10,7 @@ import com.kxxfydj.utils.NumberFormatUtil;
 import com.kxxfydj.utils.RequestUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -30,16 +31,13 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GitHubProcessor extends CodeProcessor {
 
-    private String filePath;
-
     private List<CodeInfo> codeInfoList = new ArrayList<>();
-
-    private AtomicInteger pageCount = new AtomicInteger(0);
 
     private AtomicLong totalCount = new AtomicLong(0L);
 
     private AtomicLong handleredCount = new AtomicLong(0L);
 
+    private boolean hasNext = false;
 
     public GitHubProcessor(Site site, CrawlerTask crawlerTask) {
         super(site,crawlerTask);
@@ -58,23 +56,32 @@ public class GitHubProcessor extends CodeProcessor {
         for (Element repo : repoList) {
             Element codeLinkTag = repo.getElementsByTag("a").first();
             String codeLink = codeLinkTag.attr("href");
-            String language = document.child(1).text();
+            String language = repo.child(1).text();
             Request request = RequestUtil.createGetRequest(codeLink, CommonTag.NEXT_PAGE);
             request.putExtra("language",language);
-            totalCount.incrementAndGet();
-            page.addTargetRequest(request);
+            synchronized (totalCount) {
+                if (totalCount.get() <= crawlerTask.getFilterCount()) {
+                    totalCount.incrementAndGet();
+                    page.addTargetRequest(request);
+                } else {
+                    hasNext = false;
+                    return;
+                }
+            }
         }
         Element nextPage = document.selectFirst("#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > div.paginate-container > div > a.next_page");
         String nextUrl = nextPage.attr("href");
-        pageCount.incrementAndGet();
         if(StringUtils.isNotBlank(nextUrl)){
+            hasNext = true;
             Request request = RequestUtil.createGetRequest(nextUrl,CommonTag.FIRST_PAGE);
             page.addTargetRequest(request);
+        }else{
+            hasNext = false;
         }
     }
 
     @Override
-    protected Pair<String, String> parseNextPage(Page page) {
+    protected Triplet<String, String, CodeInfo> parseNextPage(Page page) {
         if (page == null) {
             return null;
         }
@@ -98,15 +105,21 @@ public class GitHubProcessor extends CodeProcessor {
         String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
         codeInfo.setFilePath(filePath);
 
-        codeInfoList.add(codeInfo);
-        handleredCount.incrementAndGet();
+        return new Triplet<>(filePath, downloadPath, codeInfo);
+    }
 
-        return new Pair<>(filePath, downloadPath);
+    @Override
+    protected void afterDownload(boolean isSuccess,CodeInfo codeInfo) {
+        if(isSuccess){
+            codeInfoList.add(codeInfo);
+        }
+        handleredCount.incrementAndGet();
     }
 
     @Override
     protected void checkFinished(Page page) {
-        if (totalCount.get() == handleredCount.get()) {
+        logger.info("thread:{} totalCount:{} handleredCount:{}",Thread.currentThread(), totalCount.get() ,handleredCount.get());
+        if (totalCount.get() == handleredCount.get() && !hasNext) {
             page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
             page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
             page.putField(PipelineKeys.FINISHED, true);

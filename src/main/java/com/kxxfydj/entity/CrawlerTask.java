@@ -9,14 +9,24 @@ public class CrawlerTask {
 
     private String codeFilePath;
 
-    private String condition;
+    private String urlCondition;
 
-    public String getCondition() {
-        return condition;
+    private int filterCount = Integer.MAX_VALUE;
+
+    public int getFilterCount() {
+        return filterCount;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
+    public void setFilterCount(int filterCount) {
+        this.filterCount = filterCount;
+    }
+
+    public String getUrlCondition() {
+        return urlCondition;
+    }
+
+    public void setUrlCondition(String urlCondition) {
+        this.urlCondition = urlCondition;
     }
 
     public String getCrawlerName() {

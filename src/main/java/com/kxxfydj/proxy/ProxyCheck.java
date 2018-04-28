@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,8 @@ public class ProxyCheck {
     private ProxyCenter proxyCenter;
 
     private ProxyService proxyService;
+
+    private ExecutorService executor = Executors.newFixedThreadPool(4);
 
     ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(1));
 
@@ -52,11 +56,52 @@ public class ProxyCheck {
     }
 
     private void check(List<Proxy> proxyList) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()
-        ) {
-            List<Proxy> removedProxyList = new ArrayList<>();
-            for (int i = 0; i < proxyList.size(); i++) {
-                Proxy autoProxy = proxyList.get(i);
+
+        List<Proxy> removedProxyList = Collections.synchronizedList(new ArrayList<>());
+        List<Proxy> safeProxyList = Collections.synchronizedList(new ArrayList<>(proxyList));
+
+        for (int i = 0; i < proxyList.size(); i++) {
+            Proxy autoProxy = proxyList.get(i);
+            executor.execute(new CheckProxyThread(autoProxy, safeProxyList, removedProxyList));
+        }
+        try {
+            executor.awaitTermination(5, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            logger.error("代理检验程序出错，线程池执行时间过长，继续等待5分钟，出错停止！");
+            try {
+                executor.awaitTermination(5, TimeUnit.MINUTES);
+            }catch (InterruptedException e1){
+                logger.error("代理检验程序出错，线程池执行时间过长,停止！");
+            }
+        }
+        //update the database
+        int rows = proxyService.updateProxies(removedProxyList);
+        logger.info("更新数据库{}条信息", rows);
+        //sort the list and updata the redis cache
+        Collections.sort(safeProxyList);
+        proxyCenter.clearThenPut(safeProxyList);
+        logger.info("更新redis proxy缓存");
+
+
+    }
+
+    private class CheckProxyThread implements Runnable {
+
+        private Proxy autoProxy;
+
+        private List<Proxy> proxyList;
+
+        private List<Proxy> removedProxyList;
+
+        public CheckProxyThread(Proxy proxy, List<Proxy> proxyList, List<Proxy> removedList) {
+            this.autoProxy = proxy;
+            this.proxyList = proxyList;
+            this.removedProxyList = removedList;
+        }
+
+        @Override
+        public void run() {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpHost httpHost = new HttpHost(autoProxy.getIp(), autoProxy.getPort());
                 RequestConfig config = RequestConfig.custom().setProxy(httpHost)
                         .setConnectTimeout(5000).setSocketTimeout(5000).setConnectionRequestTimeout(5000).build();
@@ -82,32 +127,23 @@ public class ProxyCheck {
                 try {
                     boolean result = getFuture.get(15, TimeUnit.SECONDS);
                     if (!result) {
-                        //remove from the redis cache and  change the enabled value then update the database
-                        Proxy removedProxy = proxyList.remove(i--);
-                        removedProxy.setEnabled(false);
-                        removedProxyList.add(removedProxy);
+                        //remove from the redis cache and change the enabled value then update the database
+                        proxyList.remove(this.autoProxy);
+                        this.autoProxy.setEnabled(false);
+                        removedProxyList.add(this.autoProxy);
                         logger.info("代理IP:{}:{}不可用，从代理池中移除", autoProxy.getIp(), autoProxy.getPort());
                     }
                 } catch (Exception e) {
                     logger.info("检查代理程序线程等待超时，认定为代理ip失效");
                     //remove from the redis cache and  change the enabled value then update the database
-                    Proxy removedProxy = proxyList.remove(i--);
-                    removedProxy.setEnabled(false);
-                    removedProxyList.add(removedProxy);
+                    proxyList.remove(this.autoProxy);
+                    this.autoProxy.setEnabled(false);
+                    removedProxyList.add(this.autoProxy);
                     logger.info("代理IP:{}:{}不可用，从代理池中移除", autoProxy.getIp(), autoProxy.getPort());
                 }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
             }
-
-            //update the database
-            int rows = proxyService.updateProxies(removedProxyList);
-            logger.info("更新数据库{}条信息", rows);
-            //sort the list and updata the redis cache
-            Collections.sort(proxyList);
-            proxyCenter.clearThenPut(proxyList);
-            logger.info("更新redis proxy缓存");
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
         }
-
     }
 }

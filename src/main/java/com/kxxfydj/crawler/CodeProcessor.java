@@ -1,14 +1,14 @@
 package com.kxxfydj.crawler;
 
 import com.kxxfydj.common.CommonTag;
-import com.kxxfydj.crawler.github.GitHubProcessor;
+import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.CreateFileUtil;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.HttpsUtils;
 import com.kxxfydj.utils.JsoupRequestData;
-import com.sun.tools.javac.jvm.Code;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
@@ -17,17 +17,14 @@ import us.codecraft.webmagic.processor.PageProcessor;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by kxxfydj on 2018/3/24.
  */
 public abstract class CodeProcessor implements PageProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CodeProcessor.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CodeProcessor.class);
 
     protected CrawlerTask crawlerTask;
 
@@ -46,7 +43,7 @@ public abstract class CodeProcessor implements PageProcessor {
     public CodeProcessor(Site site, CrawlerTask crawlerTask) {
         this.crawlerTask = crawlerTask;
         this.site = site;
-        this.filePath = crawlerTask.getCodeFilePath() + File.separator + crawlerTask.getCrawlerName() + File.separator;
+        this.filePath = crawlerTask.getCodeFilePath() + File.separator + crawlerTask.getCrawlerName();
         executorService = Executors.newCachedThreadPool();
     }
 
@@ -66,35 +63,38 @@ public abstract class CodeProcessor implements PageProcessor {
     }
 
     private void processNextPage(Page page){
-        Pair<String,String> stringTuple = parseNextPage(page);
-        downloadZip(stringTuple.getValue0(),stringTuple.getValue1(),host,referer,userAgent);
+        Triplet<String,String, CodeInfo> stringTuple = parseNextPage(page);
+        boolean isSuccess = downloadZip(stringTuple.getValue0(),stringTuple.getValue1(),host,referer,userAgent);
+        afterDownload(isSuccess,stringTuple.getValue2());
         checkFinished(page);
     }
 
     abstract protected void parseFirstPage(Page page);
 
-    private void downloadZip(String filePath, String downloadPath,String host,String referer,String userAgent){
+    abstract protected void afterDownload(boolean isSuccess , CodeInfo codeInfo);
+
+    private boolean downloadZip(String filePath, String downloadPath,String host,String referer,String userAgent){
         Map<String, String> requestHeaderMap;
         requestHeaderMap = HeaderUtils.initGetHeaders(host, referer, userAgent);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
-        jsoupRequestData.setFiddlerProxy();
         jsoupRequestData.setMaxSize(100*1024*1024); //100MB
-//        jsoupRequestData.setProxyFromSite(this.site);
         jsoupRequestData.setHeaders(requestHeaderMap);
-
-        Future f = executorService.submit(new DownloadTask(filePath,downloadPath,jsoupRequestData));
+        jsoupRequestData.setTimeOut(0);  //连接最大等待5分钟
+        jsoupRequestData.setFiddlerProxy();
+        Future<Boolean> f = executorService.submit(new DownloadTask(filePath,downloadPath,jsoupRequestData));
         try{
-            f.get(5, TimeUnit.MINUTES);
+            return f.get(5, TimeUnit.MINUTES);
         }catch (Exception e){
             logger.error("文件下载超时，下载路径：{}", downloadPath);
         }
+        return false;
     }
 
-    abstract protected Pair<String,String> parseNextPage(Page page);
+    abstract protected Triplet<String,String, CodeInfo> parseNextPage(Page page);
 
     abstract protected void checkFinished(Page page);
 
-    private class DownloadTask implements Runnable {
+    private class DownloadTask implements Callable<Boolean> {
 
         private String downloadPath;
 
@@ -108,11 +108,23 @@ public abstract class CodeProcessor implements PageProcessor {
             this.filePath = filePath;
         }
 
+
+
         @Override
-        public void run() {
+        public Boolean call() {
             logger.info("downloading file {}", downloadPath);
+            long timestart = System.currentTimeMillis();
+
             byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+            long timeend = System.currentTimeMillis();
+            logger.info("download file complete {}, create file {}, 耗时：{}毫秒",downloadPath, filePath, timeend - timestart);
+            if(binaryData == null){
+                return false;
+            }
+
             CreateFileUtil.generateFile(filePath, binaryData);
+            logger.info("create file {} complete",filePath);
+            return true;
         }
     }
 

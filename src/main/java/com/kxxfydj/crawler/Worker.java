@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -49,7 +50,7 @@ public class Worker {
     /**
      * 爬虫框架启动入口
      */
-    public void start(CrawlerTask crawlerTask) {
+    public void start(List<CrawlerTask> crawlerTask) {
         initTaskQueue(crawlerTask);
         while (true) {
             int activeCount = workerExecutor.getActiveCount();
@@ -84,19 +85,21 @@ public class Worker {
     /**
      * 扫描指定路径下中的爬虫任务,初始化线程池的任务队列
      */
-    private void initTaskQueue(CrawlerTask crawlerTask) {
+    private void initTaskQueue(List<CrawlerTask> crawlerTaskList) {
         try {
-            //扫描指定包下的crawler任务,然后加入线程池任务队列
-            Map<String, Class<Crawler>> supportCrawlerClazzMap = crawlerConfig.getSupportCrawlerClazzMap();
-            Class<Crawler> clazz = supportCrawlerClazzMap.get(crawlerTask.getCrawlerName());
-            if(clazz == null){
-                logger.error("not found the crawler for the crawler task!");
-                return;
+            for(CrawlerTask crawlerTask : crawlerTaskList) {
+                //扫描指定包下的crawler任务,然后加入线程池任务队列
+                Map<String, Class<Crawler>> supportCrawlerClazzMap = crawlerConfig.getSupportCrawlerClazzMap();
+                Class<Crawler> clazz = supportCrawlerClazzMap.get(crawlerTask.getCrawlerName());
+                if (clazz == null) {
+                    logger.error("not found the crawler for the crawler task!");
+                    return;
+                }
+                Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
+                crawler.setCrawlerConfig(crawlerConfig);
+                crawler.setCrawlerTask(crawlerTask);
+                queue.add(crawler);
             }
-            Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
-            crawler.setCrawlerConfig(crawlerConfig);
-            crawler.setCrawlerTask(crawlerTask);
-            queue.add(crawler);
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error("class新建对象失败! message:{}", e.getMessage());
         }

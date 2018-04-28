@@ -14,9 +14,19 @@ public class CodeContent {
 
     private Date addTime;
 
+    private int codeInfoId;
+
     private String fatherPath;
 
     private boolean enabled;
+
+    public int getCodeInfoId() {
+        return codeInfoId;
+    }
+
+    public void setCodeInfoId(int codeInfoId) {
+        this.codeInfoId = codeInfoId;
+    }
 
     public Date getAddTime() {
         return addTime;
