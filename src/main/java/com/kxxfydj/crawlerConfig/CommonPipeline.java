@@ -129,7 +129,7 @@ public class CommonPipeline implements Pipeline {
         logger.info("codeInfo对象缓存到redis中！共{}条", codeInfoKeys.size());
 
         logger.info("开始解压文件！");
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
+        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath());
         logger.info("文件入库！");
         unzipService.fileToDatabase(crawlerConfig.getCodeunzipPath());
     }

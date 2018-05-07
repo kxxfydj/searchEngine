@@ -14,6 +14,26 @@ public class HitDocument {
 
     private String projectName;
 
+    private String language;
+
+    private String repository;
+
+    public String getRepository() {
+        return repository;
+    }
+
+    public void setRepository(String repository) {
+        this.repository = repository;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getGitPath() {
         return gitPath;
     }

@@ -28,14 +28,27 @@ public class UnzipServiceImp implements UnzipService{
 
     @Override
     public void fileToDatabase(String filePath){
-        List<CodeContent> codeContentList = new ArrayList<>();
-        File fatherFile = new File(filePath);
-        if(fatherFile.isFile() && !fatherFile.getAbsolutePath().endsWith(".zip")){
-            handlerFileToDatabase(fatherFile,codeContentList,true);
-        }else if(fatherFile.isDirectory()){
-            handlerLeafFile(fatherFile,codeContentList);
+        File file = new File(filePath);
+        if(file.isDirectory()){
+            File[] fileChildren = file.listFiles();
+            List<CodeContent> codeContentList = new ArrayList<>();
+            for(File fileChild: fileChildren){
+                if(fileChild.isDirectory()){
+                    handlerLeafFile(fileChild, codeContentList);
+                }else {
+                    handlerFileToDatabase(fileChild, codeContentList, false);
+                }
+                logger.info("codeContentList size:{}",codeContentList.size());
+                for(int i = 0; i < codeContentList.size(); i+=1000){
+                    int y = i + 1000;
+                    codeContentService.saveOrUpdate(codeContentList.subList(i,y > codeContentList.size() ? codeContentList.size() : y));
+
+                }
+                logger.info("file:{}",fileChild.getAbsolutePath());
+                codeContentList.clear();
+            }
         }
-        codeContentService.saveOrUpdate(codeContentList);
+
     }
 
     private void handlerLeafFile(File file,List<CodeContent> codeContentList){

@@ -32,12 +32,12 @@ public class FileTest {
 
     @Test
     public void test(){
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
+        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath());
     }
 
     @Test
     public void testFileToDatabase(){
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig);
+//        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath());
         unzipService.fileToDatabase(crawlerConfig.getCodeunzipPath());
     }
 

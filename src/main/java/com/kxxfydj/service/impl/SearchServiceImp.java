@@ -41,11 +41,10 @@ public class SearchServiceImp implements SearchService {
 
     private List<HitDocument> handlerSearch(String clause){
         List<HitDocument> documentList = redisUtil.lGet(RedisKeys.DOCUMENTLIST.getKey() + ":" + clause,0,-1);
-        if( !documentList.isEmpty()){
-            logger.info("查询语句有缓存，从缓存中读取数据");
-            return documentList;
+        if( documentList == null || documentList.isEmpty()){
+            return searchIndex.searchIndex(clause);
         }
-
-        return searchIndex.searchIndex(clause);
+        logger.info("查询语句有缓存，从缓存中读取数据");
+        return documentList;
     }
 }

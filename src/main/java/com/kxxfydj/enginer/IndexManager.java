@@ -35,7 +35,7 @@ public class IndexManager {
     public IndexManager(EngineConfig engineConfig) {
         analyzer = new StandardAnalyzer();
         indexWriterConfig = new IndexWriterConfig(analyzer);
-        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        indexWriterConfig.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         this.engineConfig = engineConfig;
     }
 
@@ -72,6 +72,8 @@ public class IndexManager {
                 document.add(new TextField(EngineConfig.CONTENT, codeContent.getBody(), Field.Store.YES));
                 document.add(new TextField(EngineConfig.PROJECTNAME, codeInfo.getProjectName(),Field.Store.YES));
                 document.add(new TextField(EngineConfig.GITPATH,codeInfo.getGitPath(),Field.Store.YES));
+                document.add(new TextField(EngineConfig.LANGUAGE,codeInfo.getLanguage(),Field.Store.YES));
+                document.add(new TextField(EngineConfig.REPOSITORY,codeInfo.getRepository(),Field.Store.YES));
 
                 indexWriter.addDocument(document);
 

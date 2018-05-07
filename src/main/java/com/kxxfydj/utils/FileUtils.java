@@ -60,22 +60,21 @@ public class FileUtils {
      * @param filePath 指定目标文件夹
      * @return 成功返回true，如果其中任何一个文件解压失败，返回false
      */
-    public static boolean unzipFiles(String filePath, CrawlerConfig crawlerConfig) {
+    public static boolean unzipFiles(String filePath, String unzipPath) {
         File fatherFile = new File(filePath);
         boolean flag = true;
         if (fatherFile.isFile()) {
             if (fatherFile.getAbsolutePath().endsWith(".zip")) {
-                unzip(filePath, filePath, true);
+                flag = flag && unzip(filePath, unzipPath, true);
+                //unzip(filePath, filePath, true)
             }
         }
         File[] childFiles = fatherFile.listFiles();
         for (File childFile : childFiles) {
-            if (childFile.isFile()) {
-                String preffix = crawlerConfig.getCodezipPath();
-                String replaceStr = crawlerConfig.getCodeunzipPath();
-                flag = flag && unzip(childFile.getAbsolutePath(), childFile.getParent().replaceFirst(preffix, replaceStr), true);
-            } else {
-                flag = flag && unzipFiles(childFile.getAbsolutePath(), crawlerConfig);
+            if (childFile.isFile() && childFile.getAbsolutePath().endsWith(".zip")) {
+                flag = flag && unzip(childFile.getAbsolutePath(), unzipPath, true);
+            } else if(childFile.isDirectory()){
+                flag = flag && unzipFiles(childFile.getAbsolutePath(), unzipPath);
             }
         }
         return flag;
@@ -167,7 +166,7 @@ public class FileUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("解压文件出错！zipFile:{} name:", zipFilePath, zipFile.getName(), e.getMessage(), e);
+            logger.error("解压文件出错！zipFile:{} name:{}", zipFilePath, zipFile.getName(), e.getMessage(), e);
             flag = false;
         }
         return flag;

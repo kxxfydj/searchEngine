@@ -3,6 +3,8 @@ package com.kxxfydj.view.controller;
 import com.kxxfydj.entity.CodeContent;
 import com.kxxfydj.form.HitDocument;
 import com.kxxfydj.service.SearchService;
+import org.apache.commons.collections4.MultiSet;
+import org.apache.commons.collections4.multiset.HashMultiSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ public class CodeController {
     private SearchService searchService;
 
     @RequestMapping(value = "searchCode" ,method = RequestMethod.GET)
-    public ModelAndView searchCode(String clause){
+    public ModelAndView searchCode(String clause,int pageIndex){
         List<HitDocument> hitDocumentList = null;
         if(clause.contains(":")) {
             hitDocumentList = searchService.fieldSearch(clause);
@@ -34,7 +36,23 @@ public class CodeController {
             hitDocumentList = searchService.defaultSearchContent(clause);
         }
         ModelAndView modelAndView = new ModelAndView("search/jsp/searchPage.jsp");
-        modelAndView.addObject("hitList",hitDocumentList);
+        int indexStart = (pageIndex - 1)*10;
+        int indexEnd = (indexStart + 10) > hitDocumentList.size() ? hitDocumentList.size() : (indexStart + 10);
+        int pageCount = hitDocumentList.size()/10;
+        modelAndView.addObject("currentPage",pageIndex);
+        modelAndView.addObject("pageCount",pageCount);
+        modelAndView.addObject("hitList",hitDocumentList.subList(indexStart,indexEnd));
+
+        MultiSet<String> languageCount = new HashMultiSet<>();
+        MultiSet<String> repositoryCount = new HashMultiSet<>();
+        for(HitDocument document : hitDocumentList){
+            languageCount.add(document.getLanguage());
+//            System.out.println(document.getPath().substring(document.getPath().indexOf("\\",document.getPath().indexOf("\\")+1),document.getPath().length()));
+            repositoryCount.add(document.getRepository());
+        }
+        modelAndView.addObject("languageCount",languageCount);
+        modelAndView.addObject("repositoryCount",repositoryCount);
+
         return modelAndView;
     }
 }

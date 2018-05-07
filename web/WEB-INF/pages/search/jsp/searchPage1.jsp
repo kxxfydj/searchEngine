@@ -9,16 +9,16 @@
           content="searchcode is a free source code and documentation search engine. API documentation, code snippets and open source (free sofware) repositories are indexed and searchable."/>
     <link rel="shortcut icon" href="https://searchcode.com/static/favicon.ico" type="image/x-icon"/>
     <title>Search for ad | source code search engine</title>
-    <link href="./static/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="./static/css/style.css" rel="stylesheet"/>
-    <link href="./static/css/jquery.nouislider.css" rel="stylesheet"/>
+    <link href="./search/static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="./search/static/css/style.css" rel="stylesheet"/>
+    <link href="./search/static/css/jquery.nouislider.css" rel="stylesheet"/>
     <link rel="search" type="application/opensearchdescription+xml" title="searchcode"
           href="https://addons.mozilla.org/firefox/downloads/latest/570226/addon-570226-latest.xml"/>
     <script async="" src="https://www.google-analytics.com/analytics.js"></script>
     <script type="text/javascript" async="" src="https://portfold.com/code/1/"></script>
-    <script src=".//static/js/jquery-1.11.1.min.js"></script>
-    <script id="_bsa_srv-CVAIVKJU_0" type="text/javascript" src="./static/json/CVAIVKJU.json"></script>
-    <script id="_carbonads_projs" type="text/javascript" src="./static/json/C6AILKT.json"></script>
+    <script src="./search/static/js/jquery-1.11.1.min.js"></script>
+    <script id="_bsa_srv-CVAIVKJU_0" type="text/javascript" src="./search/static/json/CVAIVKJU.json"></script>
+    <script id="_carbonads_projs" type="text/javascript" src="./search/static/json/C6AILKT.json"></script>
 </head>
 <body>
 <nav class="navbar navbar-default" role="navigation">
@@ -27,7 +27,7 @@
             <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span>
             <span class="icon-bar"></span></button>
         <a class="navbar-brand" href="https://searchcode.com/"> <img height="24px"
-                                                                     src="./static/img/searchcode_logo.png"/>
+                                                                     src="./search/static/img/searchcode_logo.png"/>
         </a>
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -49,7 +49,7 @@
                 </div>
             </form>
         </div>
-        <script src="./static/js/monetization.js" type="text/javascript"></script>
+        <script src="./search/static/js/monetization.js" type="text/javascript"></script>
         <div id="ad_top"></div>
         <script>
             (function () {
@@ -80,7 +80,7 @@
                 </div>
                 <center>
                     <div class="search-filters-ad">
-                        <script async="" type="text/javascript" src="./static/js/carbon.js"
+                        <script async="" type="text/javascript" src="./search/static/js/carbon.js"
                                 id="_carbonads_js"></script>
                     </div>
                 </center>
@@ -254,10 +254,10 @@
         <!--End mc_embed_signup-->
         <p></p>
         <p>searchcode is proudly Made in kxxfydj | &copy; kxxfydj 202018</p>
-        <script async="" src="./static/js/script.js"></script>
-        <script async="" src="./static/js/jquery.nouislider.min.js"></script>
-        <script async="" src="./static/js/bootstrap.min.js"></script>
-        <script async="" src="./static/js/typeahead.bundle.min.js"></script>
+        <script async="" src="./search/static/js/script.js"></script>
+        <script async="" src="./search/static/js/jquery.nouislider.min.js"></script>
+        <script async="" src="./search/static/js/bootstrap.min.js"></script>
+        <script async="" src="./search/static/js/typeahead.bundle.min.js"></script>
     </div>
 </div>
 <script>

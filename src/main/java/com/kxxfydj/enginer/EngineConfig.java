@@ -24,6 +24,10 @@ public class EngineConfig {
 
     public static final String GITPATH = "gitPath";
 
+    public static final String LANGUAGE = "language";
+
+    public static final String REPOSITORY = "repository";
+
     @Value("#{settings['crawler.codefile.path']}")
     private String zipFilePath;
 

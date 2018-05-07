@@ -61,6 +61,8 @@ public class SearchIndex {
                 document.setPath(hitDoc.get(EngineConfig.PATH));
                 document.setProjectName(hitDoc.get(EngineConfig.PROJECTNAME));
                 document.setGitPath(hitDoc.get(EngineConfig.GITPATH));
+                document.setLanguage(hitDoc.get(EngineConfig.LANGUAGE));
+                document.setRepository(hitDoc.get(EngineConfig.REPOSITORY));
 
                 documentList.add(document);
             }
