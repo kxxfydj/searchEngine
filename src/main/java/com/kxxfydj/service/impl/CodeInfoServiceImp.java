@@ -45,4 +45,9 @@ public class CodeInfoServiceImp implements CodeInfoService{
     public List<CodeInfo> getAllCodeInfo() {
         return codeInfoMapper.selectAll();
     }
+
+    @Override
+    public CodeInfo getCodeInfoByProjectNameAndRepository(String projectName, String repository) {
+        return codeInfoMapper.selectByProjectNameAndRepository(projectName,repository);
+    }
 }

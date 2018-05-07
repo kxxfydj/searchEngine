@@ -10,9 +10,10 @@ import java.util.List;
 public interface CodeContentService {
 
     List<CodeContent> getAllFiles();
-    List<CodeContent> getFileChildren(CodeContent codeContent);
-    CodeContent getFileFather(CodeContent codeContent);
-    List<CodeContent> getFileAncestor(CodeContent codeContent);
+    List<CodeContent> getFileChildren(String path);
+    CodeContent getFileFather(String path);
+    CodeContent getFile(String path);
+    List<CodeContent> getFileAncestor(String path);
     int saveOrUpdate(List<CodeContent> codeContentList);
     int saveOrUpdate(CodeContent codeContent);
 

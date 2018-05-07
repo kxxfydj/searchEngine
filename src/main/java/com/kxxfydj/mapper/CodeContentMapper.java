@@ -10,9 +10,10 @@ import java.util.List;
 public interface CodeContentMapper {
     List<CodeContent> selectAll();
 
-    List<CodeContent> selectChildren(CodeContent codeContent);
-    CodeContent selectFather(CodeContent codeContent);
-    List<CodeContent> selectAncestor(CodeContent codeContent);
+    List<CodeContent> selectChildren(String path);
+    CodeContent selectFather(String path);
+    CodeContent selectFile(String filePath);
+    List<CodeContent> selectAncestor(String path);
     int saveOrUpdate(List<CodeContent> codeContentList);
     int saveOrUpdateOne(CodeContent codeContent);
 

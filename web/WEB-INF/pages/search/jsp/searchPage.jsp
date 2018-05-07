@@ -1,4 +1,3 @@
-<%@ page import="org.apache.commons.collections4.MultiSet" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -127,12 +126,13 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-9 search-results">
+
+            <div class="col-md-9 search-results" id="codeFileList">
                 <c:forEach items="${hitList}" var="hitDocument" begin="0" end="10">
                     <div class="code-result">
                         <div>
                             <h5>
-                                <a href="../searchFile.html?${hitDocument.path}">${hitDocument.path.substring(hitDocument.path.indexOf("\\",hitDocument.path.indexOf("\\") + 1) + 1,hitDocument.path.length())}</a>
+                                <a href="../searchResource/searchFile.html?filePath=${hitDocument.path}">${hitDocument.path.substring(hitDocument.path.indexOf("\\",hitDocument.path.indexOf("\\") + 1) + 1,hitDocument.path.length())}</a>
                                 <small><a href="${hitDocument.gitPath}">git地址:${hitDocument.gitPath}</a>
                                     | ${hitDocument.language}
                                 </small>
@@ -142,7 +142,7 @@
                             <c:set var="contents" value="${hitDocument.content.split(\"\\\\n\")}"/>
                             <c:forEach items="${contents}" var="content" begin="0" end="15">
                                 <li><a
-                                        href="https://searchcode.com/file/97444400/modules/adwords_axis/src/main/java/com/google/api/ads/adwords/axis/v201309/cm/Ad.java#l-1">
+                                        href="../searchResource/searchFile.html?filePath=${hitDocument.path}">
                                     <pre><c:out value="${content}"/></pre>
                                 </a></li>
                             </c:forEach>
@@ -151,6 +151,7 @@
                 </c:forEach>
                 <hr class="spacer"/>
             </div>
+
             <div class="search-pagination">
                 <ul id="pages" class="pagination">
                     <%
@@ -174,11 +175,11 @@
                         for (int k = start; k <= end; k++) {
                             if (k == currentPage) {
                     %>
-                    <li class="active"><a href="https://searchcode.com/?q=ad#"><%=k%></a></li>
+                    <li class="active"><a href="#codeFileList"><%=k%></a></li>
                     <%
                     } else {
                     %>
-                    <li><a href="https://searchcode.com/?q=ad&amp;p=1&amp;loc=0&amp;loc2=10000"><%=k%></a></li>
+                    <li><a href="../search/searchCode.html?clause=${searchClause}&pageIndex=<%=k%>"><%=k%></a></li>
                     <%
                             }
                         }

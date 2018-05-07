@@ -14,4 +14,5 @@ public interface CodeInfoService {
     List<CodeInfo> getAllCodeInfo();
     CodeInfo getCodeInfoByGitPath(String gitPath);
     int cleanCodeInfo();
+    CodeInfo getCodeInfoByProjectNameAndRepository(String projectName,String repository);
 }

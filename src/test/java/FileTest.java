@@ -38,7 +38,7 @@ public class FileTest {
     @Test
     public void testFileToDatabase(){
 //        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath());
-        unzipService.fileToDatabase(crawlerConfig.getCodeunzipPath());
+        unzipService.fileToDatabase("github",crawlerConfig.getCodeunzipPath(),false);
     }
 
     @Test

@@ -23,18 +23,23 @@ public class CodeContentServiceImp implements CodeContentService {
     }
 
     @Override
-    public List<CodeContent> getFileChildren(CodeContent codeContent) {
-        return filterContentByDate(codeContentMapper.selectChildren(codeContent));
+    public List<CodeContent> getFileChildren(String path) {
+        return filterContentByDate(codeContentMapper.selectChildren(path));
     }
 
     @Override
-    public CodeContent getFileFather(CodeContent codeContent) {
-        return codeContentMapper.selectFather(codeContent);
+    public CodeContent getFileFather(String path) {
+        return codeContentMapper.selectFather(path);
     }
 
     @Override
-    public List<CodeContent> getFileAncestor(CodeContent codeContent) {
-        return filterContentByDate(codeContentMapper.selectAncestor(codeContent));
+    public CodeContent getFile(String path) {
+        return codeContentMapper.selectFile(path);
+    }
+
+    @Override
+    public List<CodeContent> getFileAncestor(String path) {
+        return filterContentByDate(codeContentMapper.selectAncestor(path));
     }
 
     @Override

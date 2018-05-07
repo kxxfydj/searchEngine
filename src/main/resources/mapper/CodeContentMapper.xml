@@ -15,6 +15,10 @@
         SELECT * from codecontent;
     </select>
 
+    <select id="selectFile" resultMap="baseResultMap">
+        SELECT * from codecontent WHERE path = #{path};
+    </select>
+
     <select id="selectChildren" resultMap="baseResultMap">
         SELECT * from codecontent where path LIKE #{path} + "%" AND enabled = 1;
     </select>
@@ -73,13 +77,13 @@
         enabled
         )
         VALUES
-        <foreach collection="itemList" item="item" separator=",">
+        <foreach collection="list" item="item" separator=",">
             (
             #{item.path,jdbcType=VARCHAR},
             #{item.body,jdbcType=VARCHAR},
             #{item.codeInfoId,jdbcType=INTEGER},
             #{item.fatherPath,jdbcType=VARCHAR},
-            #{item.enabled,jdbcType=TINYINT},
+            #{item.enabled,jdbcType=TINYINT}
             )
         </foreach>
     </insert>

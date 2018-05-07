@@ -52,6 +52,10 @@
         select * from codeinfo;
     </select>
 
+    <select id="selectByProjectNameAndRepository" resultMap="baseResultMap">
+        select * from codeinfo where projectName = #{projectName} AND repository = #{repository};
+    </select>
+
     <select id="selectByProjectName" resultMap="baseResultMap">
         SELECT * from codeinfo where projectName = #{projectName}
     </select>

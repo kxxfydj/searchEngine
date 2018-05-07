@@ -34,7 +34,7 @@ public class GitLabCrawler extends CrawlerBase {
                 .addRequest(request)
                 .setScheduler(new MyQueueScheduler())
                 .thread(crawlerConfig.getSpiderThreadSize())
-                .addPipeline(new CommonPipeline(crawlerConfig));
+                .addPipeline(new CommonPipeline(this.crawlerTask,crawlerConfig));
 
         new CrawlerListener(spider);
         spider.start();

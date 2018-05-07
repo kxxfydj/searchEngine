@@ -5,6 +5,7 @@ import com.kxxfydj.common.PipelineKeys;
 import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CodeRepository;
+import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.entity.Proxy;
 import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.CodeInfoService;
@@ -20,6 +21,7 @@ import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +44,16 @@ public class CommonPipeline implements Pipeline {
 
     private CrawlerConfig crawlerConfig;
 
-    public CommonPipeline(CrawlerConfig crawlerConfig) {
+    private CrawlerTask crawlerTask;
+
+    public CommonPipeline(CrawlerTask crawlerTask, CrawlerConfig crawlerConfig) {
         codeInfoService = ApplicationContextUtils.getBean(CodeInfoService.class);
         codeRepositoryService = ApplicationContextUtils.getBean(CodeRepositoryService.class);
         proxyService = ApplicationContextUtils.getBean(ProxyService.class);
         redisUtil = ApplicationContextUtils.getBean(RedisUtil.class);
         unzipService = ApplicationContextUtils.getBean(UnzipService.class);
         this.crawlerConfig = crawlerConfig;
+        this.crawlerTask = crawlerTask;
     }
 
     @Override
@@ -129,8 +134,8 @@ public class CommonPipeline implements Pipeline {
         logger.info("codeInfo对象缓存到redis中！共{}条", codeInfoKeys.size());
 
         logger.info("开始解压文件！");
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath());
+        FileUtils.unzipFiles(crawlerConfig.getCodezipPath(),crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getCrawlerName());
         logger.info("文件入库！");
-        unzipService.fileToDatabase(crawlerConfig.getCodeunzipPath());
+        unzipService.fileToDatabase(crawlerTask.getCrawlerName(), crawlerConfig.getCodeunzipPath() ,false);
     }
 }

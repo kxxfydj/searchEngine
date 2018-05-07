@@ -53,6 +53,7 @@ public class CodeController {
         modelAndView.addObject("languageCount",languageCount);
         modelAndView.addObject("repositoryCount",repositoryCount);
 
+        modelAndView.addObject("searchClause",clause);
         return modelAndView;
     }
 }
