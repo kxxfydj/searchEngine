@@ -38,6 +38,11 @@ public class CodeContentServiceImp implements CodeContentService {
     }
 
     @Override
+    public List<String> getFileByCodeInfoId(int codeInfoId) {
+        return codeContentMapper.selectFileByCodeInfoId(codeInfoId);
+    }
+
+    @Override
     public List<CodeContent> getFileAncestor(String path) {
         return filterContentByDate(codeContentMapper.selectAncestor(path));
     }

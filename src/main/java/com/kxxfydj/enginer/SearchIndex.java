@@ -2,6 +2,7 @@ package com.kxxfydj.enginer;
 
 import com.kxxfydj.form.HitDocument;
 import com.kxxfydj.redis.RedisUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -10,6 +11,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
@@ -49,6 +51,11 @@ public class SearchIndex {
             IndexSearcher indexSearcher = new IndexSearcher(reader);
             QueryParser queryParser = new QueryParser(EngineConfig.CONTENT,analyzer);
             Query query = queryParser.parse(clauses);
+            SimpleHTMLFormatter simpleHtmlFormatter = new SimpleHTMLFormatter("<strong>","</strong>");
+            QueryScorer scorer = new QueryScorer(query);
+            Highlighter highlighter = new Highlighter(simpleHtmlFormatter,scorer);
+            Fragmenter fragment=new NullFragmenter();
+            highlighter.setTextFragmenter(fragment);
             ScoreDoc[] hits = indexSearcher.search(query,1000).scoreDocs;
 
             List<HitDocument> documentList = new ArrayList<>();
@@ -57,7 +64,11 @@ public class SearchIndex {
                 Document hitDoc = indexSearcher.doc(doc.doc);
 
                 document.setFileName(hitDoc.get(EngineConfig.FILENAME));
-                document.setContent(hitDoc.get(EngineConfig.CONTENT));
+
+                String content = StringEscapeUtils.escapeHtml(hitDoc.get(EngineConfig.CONTENT));
+                String bestFragment = highlighter.getBestFragment(analyzer, EngineConfig.CONTENT, content);
+                document.setContent(bestFragment);
+
                 document.setPath(hitDoc.get(EngineConfig.PATH));
                 document.setProjectName(hitDoc.get(EngineConfig.PROJECTNAME));
                 document.setGitPath(hitDoc.get(EngineConfig.GITPATH));

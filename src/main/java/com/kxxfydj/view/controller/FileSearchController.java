@@ -6,12 +6,15 @@ import com.kxxfydj.entity.CodeContent;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.CodeContentService;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.List;
 
@@ -21,6 +24,8 @@ import java.util.List;
 @Controller
 @RequestMapping("searchResource")
 public class FileSearchController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileSearchController.class);
 
     @Autowired
     private CodeContentService codeContentService;
@@ -33,8 +38,16 @@ public class FileSearchController {
 
     @RequestMapping(value = "searchFile", method = RequestMethod.GET)
     public ModelAndView searchFile(String filePath) {
-        String wholePath = crawlerConfig.getCodeunzipPath() + File.separator + filePath;
-//        wholePath = wholePath.replaceAll("\\\\","\\\\\\\\");
+        if(StringUtils.isBlank(filePath)){
+            logger.info("获取文件信息请求中文件的路径为空！");
+            return null;
+        }
+        String wholePath;
+        if(filePath.startsWith("\\")){
+            wholePath = crawlerConfig.getCodeunzipPath() + filePath;
+        }else {
+            wholePath = crawlerConfig.getCodeunzipPath() + File.separator + filePath;
+        }
 
         CodeContent codeContent = codeContentService.getFile(wholePath);
         if(codeContent == null){
@@ -50,23 +63,27 @@ public class FileSearchController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "searchDir", method = RequestMethod.GET)
-    public ModelAndView searchDir(String filePath){
-        String wholePath = crawlerConfig.getCodeunzipPath() + File.separator + filePath;
-        List<CodeContent> codeContentList = codeContentService.getFileChildren(wholePath);
-        if(codeContentList == null || codeContentList.isEmpty()){
+    @RequestMapping(value = "directory_tree/{codeInfoId}/", method = RequestMethod.GET)
+    @ResponseBody
+    public String searchDir(@PathVariable int codeInfoId){
+        List<String> fileList = codeContentService.getFileByCodeInfoId(codeInfoId);
+        if(fileList == null || fileList.isEmpty()){
             return null;
         }
 
-        CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContentList.get(0).getCodeInfoId());
+        CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeInfoId);
         if(codeInfo == null){
             return null;
         }
 
-        ModelAndView modelAndView = new ModelAndView("search/jsp/searchDirectory.jsp");
-        modelAndView.addObject("codeContentList",codeContentList);
-        modelAndView.addObject("codeInfo",codeInfo);
-        modelAndView.addObject("currentPath",filePath);
-        return modelAndView;
+        StringBuilder htmlString = new StringBuilder("{\"tree\": \"");
+        String rootPath = crawlerConfig.getCodeunzipPath() + File.separator + codeInfo.getRepository() + File.separator + codeInfo.getProjectName();
+        for(String filePath : fileList){
+            String relativePath = filePath.substring(rootPath.length() + 1,filePath.length());
+            htmlString.append("<a href=\\\"./searchFile.html?filePath=" + filePath.substring(crawlerConfig.getCodeunzipPath().length() + 1, filePath.length()).replaceAll("\\\\","\\\\\\\\") + "\\\">/" + relativePath.replaceAll("\\\\","\\\\\\\\") + "</a><br>");
+        }
+        htmlString.append("\"}");
+//        StringBuilder htmlString = new StringBuilder("{\"tree\": \"<a href=\\\"/file/37250932/header.txt\\\">/header.txt</a>\"}");
+        return htmlString.toString();
     }
 }

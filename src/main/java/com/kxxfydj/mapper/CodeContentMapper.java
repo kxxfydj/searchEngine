@@ -14,6 +14,7 @@ public interface CodeContentMapper {
     CodeContent selectFather(String path);
     CodeContent selectFile(String filePath);
     List<CodeContent> selectAncestor(String path);
+    List<String> selectFileByCodeInfoId(int codeInfoId);
     int saveOrUpdate(List<CodeContent> codeContentList);
     int saveOrUpdateOne(CodeContent codeContent);
 

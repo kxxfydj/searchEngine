@@ -66,8 +66,8 @@
         <div class="row search-count" style="border-bottom: 1px solid #eee;
     padding: 10px;
     margin-top: 10px;">
-            <b>About 279,297 results: </b>
-            <span class="grey">&quot;ad&quot;</span>
+            <b>About ${totalSize} results: </b>
+            <span class="grey">&quot;${searchClause}&quot;</span>
         </div>
         <div class="row">
             <div class="col-md-3 search-filters-container search-filters">
@@ -86,10 +86,9 @@
                                 id="_carbonads_js"></script>
                     </div>
                 </center>
-                <form action="https://searchcode.com/" method="get">
+                <form action="./searchCodeFilter.html" method="post">
                     <div>
                         <h5>Repository</h5>
-
                         <c:forEach var="repository" items="${repositoryCount.entrySet()}">
                             <div class="checkbox">
                                 <label> <input type="checkbox" name="repository" value="${repository.getElement()}"/>
@@ -109,6 +108,8 @@
                             </div>
                         </c:forEach>
                     </div>
+                    <input hidden name="clause" value="${searchClause}"/>
+                    <input hidden name="pageIndex" value="${currentPage}"/>
                     <div>
                         <h5>Filter Results</h5>
                         <div class="center">
@@ -141,9 +142,9 @@
                         <ol class="code-result">
                             <c:set var="contents" value="${hitDocument.content.split(\"\\\\n\")}"/>
                             <c:forEach items="${contents}" var="content" begin="0" end="15">
-                                <li><a
-                                        href="../searchResource/searchFile.html?filePath=${hitDocument.path}">
-                                    <pre><c:out value="${content}"/></pre>
+                                <li><a href="../searchResource/searchFile.html?filePath=${hitDocument.path}">
+                                        <%--<pre><c:out value="${content}"/></pre>--%>
+                                    <pre>${content}</pre>
                                 </a></li>
                             </c:forEach>
                         </ol>
@@ -175,11 +176,13 @@
                         for (int k = start; k <= end; k++) {
                             if (k == currentPage) {
                     %>
-                    <li class="active"><a href="#codeFileList"><%=k%></a></li>
+                    <li class="active"><a href="#codeFileList"><%=k%>
+                    </a></li>
                     <%
                     } else {
                     %>
-                    <li><a href="../search/searchCode.html?clause=${searchClause}&pageIndex=<%=k%>"><%=k%></a></li>
+                    <li><a href="../search/searchCode.html?clause=${searchClause}&pageIndex=<%=k%>"><%=k%>
+                    </a></li>
                     <%
                             }
                         }

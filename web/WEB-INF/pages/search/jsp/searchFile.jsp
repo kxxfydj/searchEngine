@@ -17,7 +17,6 @@
     <link rel="search" type="application/opensearchdescription+xml" title="searchcode"
           href="https://addons.mozilla.org/firefox/downloads/latest/570226/addon-570226-latest.xml"/>
     <script async="" src="https://www.google-analytics.com/analytics.js"></script>
-    <script type="text/javascript" async="" src="https://portfold.com/code/1/"></script>
     <script src="../search/static/js/jquery-1.11.1.min.js"></script>
     <script id="_bsa_srv-CVAIVKJU_0" type="text/javascript" src="../search/static/json/CVAIVKJU.json"></script>
     <script id="_carbonads_projs" type="text/javascript" src="../search/static/json/C6AILKT.json"></script>
@@ -118,7 +117,13 @@
             <tr>
                 <td> Repository</td>
                 <td>${codeInfo.gitPath}</td>
-                <td><a href="">上一层目录</a></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <a href="#" rel="nofollow" id="file-tree-link" class="">
+                        <span class="glyphicon glyphicon-tree-conifer"></span> <span id="file-tree-button" data-id="${codeInfo.id}">View File Tree</span>
+                    </a>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -178,7 +183,7 @@ step="1">
             var dc = document.createElement('script');
             dc.type = 'text/javascript';
             dc.async = true;
-            dc.src = '//portfold.com/code/1/';
+            dc.src = 'directory_tree/${codeInfo.id}/';
             var s = document.getElementsByTagName('script')[0];
             s.parentNode.insertBefore(dc, s);
         })();

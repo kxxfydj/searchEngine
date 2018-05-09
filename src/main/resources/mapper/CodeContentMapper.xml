@@ -15,6 +15,10 @@
         SELECT * from codecontent;
     </select>
 
+    <select id="selectFileByCodeInfoId" resultType="java.lang.String">
+        SELECT path from codecontent where codeinfoId = #{codeInfoId};
+    </select>
+
     <select id="selectFile" resultMap="baseResultMap">
         SELECT * from codecontent WHERE path = #{path};
     </select>

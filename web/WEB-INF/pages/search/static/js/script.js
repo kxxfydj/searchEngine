@@ -98,12 +98,20 @@ $(document).ready(function(){
     $('#file-tree-link').click(function(e) {
       $('#file-tree').toggle();
       if(filetreedata == null) {
-        $('#file-tree-list').html('<center><img src="/static/bar-loading.gif" /></center>');
-        $.ajax('/api/directory_tree/' + dataid + '/')
-         .done(function(data, textStatus, jqXHR) {
-            filetreedata = data;
-            $('#file-tree-list').html(data['tree']);
-         });
+        $('#file-tree-list').html('<center><img src="../search/static/img/bar-loading.gif" /></center>');
+        // $.ajax('/searchResource/directory_tree.html?codeInfoId=' + dataid)
+        //  .done(function(data, textStatus, jqXHR) {
+        //     filetreedata = data;
+        //     $('#file-tree-list').html(data['tree']);
+        //  });
+          $.ajax({
+              url:"/searchResource/directory_tree/" + dataid + "/",
+              success:function(data){
+                  filetreedata = data;
+                  var jsonObj = JSON.parse(data);
+                  $('#file-tree-list').html(jsonObj['tree']);
+              }
+          });
       }
     });
   })();

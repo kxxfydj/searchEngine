@@ -14,6 +14,7 @@ public interface CodeContentService {
     CodeContent getFileFather(String path);
     CodeContent getFile(String path);
     List<CodeContent> getFileAncestor(String path);
+    List<String> getFileByCodeInfoId(int codeInfoId);
     int saveOrUpdate(List<CodeContent> codeContentList);
     int saveOrUpdate(CodeContent codeContent);
 
