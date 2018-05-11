@@ -41,11 +41,12 @@
 <div class="container">
     <div>
         <div class="search-options">
-            <form>
+            <form action="../search/searchCode.html" method="get">
                 <div class="form-inline">
                     <div class="form-group">
                         <input autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="true" size="50"
-                               placeholder="Search Expression" type="search" class="form-control" name="q"/>
+                               placeholder="Search Expression" type="search" class="form-control" name="clause"/>
+                        <input hidden="true" name="pageIndex" value="1"/>
                     </div>
                     <input type="submit" value="search" class="btn btn-success"/>
                 </div>
@@ -129,27 +130,39 @@
             </div>
 
             <div class="col-md-9 search-results" id="codeFileList">
-                <c:forEach items="${hitList}" var="hitDocument" begin="0" end="10">
-                    <div class="code-result">
-                        <div>
-                            <h5>
-                                <a href="../searchResource/searchFile.html?filePath=${hitDocument.path}">${hitDocument.path.substring(hitDocument.path.indexOf("\\",hitDocument.path.indexOf("\\") + 1) + 1,hitDocument.path.length())}</a>
-                                <small><a href="${hitDocument.gitPath}">git地址:${hitDocument.gitPath}</a>
-                                    | ${hitDocument.language}
-                                </small>
-                            </h5>
-                        </div>
-                        <ol class="code-result">
-                            <c:set var="contents" value="${hitDocument.content.split(\"\\\\n\")}"/>
-                            <c:forEach items="${contents}" var="content" begin="0" end="15">
-                                <li><a href="../searchResource/searchFile.html?filePath=${hitDocument.path}">
-                                        <%--<pre><c:out value="${content}"/></pre>--%>
-                                    <pre>${content}</pre>
-                                </a></li>
-                            </c:forEach>
-                        </ol>
-                    </div>
-                </c:forEach>
+                <c:choose>
+                    <c:when test="${hitList.isEmpty()}">
+                        <h4>No results found :(</h4>
+                        <p>Try Search On:
+                            <a href="https://github.com/search?p=&amp;q=${searchClause}&amp;type=Code">Github</a> |
+                            <a href="http://stackoverflow.com/search?q=${searchClause}">StackOverflow</a>
+                        </p>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach items="${hitList}" var="hitDocument" begin="0" end="10">
+                            <div class="code-result">
+                                <div>
+                                    <h5>
+                                        <a href="../searchResource/searchFile.html?filePath=<c:out value="${hitDocument.path.replaceAll(\"</?strong>\",\"\")}"/>">${hitDocument.path.substring(hitDocument.path.indexOf("\\",hitDocument.path.indexOf("\\") + 1) + 1,hitDocument.path.length())}</a>
+                                        <small><a href="${hitDocument.gitPath}">git地址:${hitDocument.gitPath}</a>
+                                            | ${hitDocument.language}
+                                        </small>
+                                    </h5>
+                                </div>
+                                <ol class="code-result">
+                                    <c:set var="contents" value="${hitDocument.content.split(\"\\\\n\")}"/>
+                                    <c:forEach items="${contents}" var="content" begin="0" end="15">
+                                        <li><a href="../searchResource/searchFile.html?filePath=${hitDocument.path}">
+                                                <%--<pre><c:out value="${content}"/></pre>--%>
+                                            <pre>${content}</pre>
+                                        </a></li>
+                                    </c:forEach>
+                                </ol>
+                            </div>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+
                 <hr class="spacer"/>
             </div>
 

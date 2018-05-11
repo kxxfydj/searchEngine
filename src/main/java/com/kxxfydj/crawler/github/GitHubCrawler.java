@@ -27,7 +27,7 @@ public class GitHubCrawler extends CrawlerBase {
         site = site.addHeader("Referer", "https://github.com/")
                 .addHeader("Host", "github.com");
 
-        super.setProxy();
+//        super.setProxy();
         super.setFiddlerProxy();
         String url = URLUtil.encode("https://github.com/search?utf8=%E2%9C%93&q=" + this.condition + "&type=","UTF-8");
         url = url.replaceAll("%2B","+");

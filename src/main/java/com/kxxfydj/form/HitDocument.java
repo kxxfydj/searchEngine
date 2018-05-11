@@ -14,7 +14,7 @@ public class HitDocument {
 
     private String projectName;
 
-    private String language;
+    private String language = "";
 
     private String repository;
 

@@ -67,4 +67,44 @@
     <select id="selectByGitPath" resultMap="baseResultMap">
         SELECT * from codeinfo where gitPath = #{gitPath};
     </select>
+
+    <insert id="insertOrUpdate" parameterType="java.util.List">
+        INSERT INTO codeinfo(id,projectName,repository,language,description,filePath,stars,gitPath,repositoryId,author) values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id,jdbcType=INTEGER},
+            #{item.projectName,jdbcType=VARCHAR},
+            #{item.repository,jdbcType=VARCHAR},
+            #{item.language,jdbcType=INTEGER},
+            #{item.description,jdbcType=VARCHAR},
+            #{item.filePath,jdbcType=VARCHAR},
+            #{item.stars,jdbcType=INTEGER},
+            #{item.gitPath,jdbcType=VARCHAR},
+            #{item.repositoryId,jdbcType=INTEGER},
+            #{item.author,jdbcType=VARCHAR}
+            )
+        </foreach>
+        on DUPLICATE KEY UPDATE
+        <trim prefix="stars = case" suffix="end,">
+            <foreach collection="list" item="item">
+                <if test="item.stars!=null">
+                    when projectName=#{item.projectName} and repository=#{item.repository} then #{item.stars}
+                </if>
+            </foreach>
+        </trim>
+        <trim prefix="filePath = case" suffix="end,">
+            <foreach collection="list" item="item">
+                <if test="item.filePath!=null">
+                    when projectName=#{item.projectName} and repository=#{item.repository} then #{item.filePath}
+                </if>
+            </foreach>
+        </trim>
+        <trim prefix="description = case" suffix="end">
+            <foreach collection="list" item="item">
+                <if test="item.description!=null">
+                    when projectName=#{item.projectName} and repository=#{item.repository} then #{item.description}
+                </if>
+            </foreach>
+        </trim>
+    </insert>
 </mapper>

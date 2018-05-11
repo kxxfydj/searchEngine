@@ -35,7 +35,7 @@ public class GitLabProcessor extends CodeProcessor {
     private List<CodeInfo> codeInfoList = new ArrayList<>();
 
     public GitLabProcessor(Site site, CrawlerTask crawlerTask) {
-        super(site,crawlerTask);
+        super(site, crawlerTask);
         this.host = "gitlab.com";
         this.referer = null;
         this.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
@@ -50,16 +50,15 @@ public class GitLabProcessor extends CodeProcessor {
         for (Element item : items) {
             Element tagA = item.getElementsByTag("a").get(1);
             String link = tagA.attr("href");
-            Element tagSpan = item.child(2).child(1);
+            Element tagSpan = item.child(2).child(0);
             int stars = NumberFormatUtil.formatInt(tagSpan.text());
             if (stars < 200) {
                 stop = true;
                 break;
             }
-            if(totalCount.incrementAndGet() <= crawlerTask.getFilterCount()) {
-                Request request = RequestUtil.createGetRequest(link, CommonTag.NEXT_PAGE);
-                page.addTargetRequest(request);
-            }else {
+            Request request = RequestUtil.createGetRequest(link, CommonTag.NEXT_PAGE);
+            page.addTargetRequest(request);
+            if (totalCount.incrementAndGet() >= crawlerTask.getFilterCount()) {
                 return;
             }
         }
@@ -89,16 +88,17 @@ public class GitLabProcessor extends CodeProcessor {
         codeInfo.setGitPath(gitPath);
         codeInfo.setProjectName(projectName);
         codeInfo.setDescription(description);
+        codeInfo.setRepository(crawlerTask.getCrawlerName());
 
         String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
         codeInfo.setFilePath(filePath);
 
-        return new Triplet<>(filePath,downloadPath, codeInfo);
+        return new Triplet<>(filePath, downloadPath, codeInfo);
     }
 
     @Override
     protected void afterDownload(boolean isSuccess, CodeInfo codeInfo) {
-        if(isSuccess){
+        if (isSuccess) {
             codeInfoList.add(codeInfo);
         }
         handlerdCount.incrementAndGet();
@@ -106,10 +106,11 @@ public class GitLabProcessor extends CodeProcessor {
 
     @Override
     protected void checkFinished(Page page) {
-        if(totalCount.get() == handlerdCount.get()){
-            page.putField(PipelineKeys.CODEINFO_LIST,codeInfoList);
+        logger.info("thread:{} totalCount:{} handleredCount:{}", Thread.currentThread(), totalCount.get(), handlerdCount.get());
+        if (totalCount.get() == handlerdCount.get()) {
+            page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
             page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITLAB.getType());
-            page.putField(PipelineKeys.FINISHED,true);
+            page.putField(PipelineKeys.FINISHED, true);
         }
     }
 }

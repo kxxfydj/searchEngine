@@ -561,13 +561,15 @@ public class RedisUtil {
      */
     public <V> boolean lSet(String key, List<V> value, long time) {
         try {
-            redisTemplate.opsForList().rightPushAll(key, value);
-            if (time > 0) expire(key, time);
-            return true;
+            if(!value.isEmpty()) {
+                redisTemplate.opsForList().rightPushAll(key, value);
+                if (time > 0) expire(key, time);
+                return true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     /**

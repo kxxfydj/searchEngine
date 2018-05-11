@@ -5,6 +5,7 @@ import com.kxxfydj.form.SearchParam;
 import com.kxxfydj.service.SearchService;
 import org.apache.commons.collections4.MultiSet;
 import org.apache.commons.collections4.multiset.HashMultiSet;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +40,7 @@ public class CodeController {
         modelAndView.addObject("currentPage", pageIndex);
         modelAndView.addObject("pageCount", pageCount);
         modelAndView.addObject("hitList", hitDocumentList.subList(indexStart, indexEnd));
+        modelAndView.addObject("totalSize", hitDocumentList.size());
 
         MultiSet<String> languageCount = new HashMultiSet<>();
         MultiSet<String> repositoryCount = new HashMultiSet<>();
@@ -56,10 +59,18 @@ public class CodeController {
     public ModelAndView searchCodeFilter(SearchParam formParam) {
         List<HitDocument> OriginHitDocumentList = getDocumentList(formParam.getClause());
 
-        List<HitDocument> hitDocumentList = OriginHitDocumentList.stream().filter(document ->
-                document.getLanguage().equalsIgnoreCase(formParam.getLanguage())
-                        && document.getRepository().equalsIgnoreCase(formParam.getRepository()))
-                .collect(Collectors.toList());
+        List<HitDocument> hitDocumentList = OriginHitDocumentList.stream().filter(document -> {
+            if (StringUtils.isNotBlank(formParam.getLanguage()) && StringUtils.isNotBlank(formParam.getRepository())) {
+                return Objects.equals(document.getLanguage().toLowerCase(), formParam.getLanguage().toLowerCase())
+                        && Objects.equals(document.getRepository().toLowerCase(), formParam.getRepository().toLowerCase());
+            }else if(StringUtils.isBlank(formParam.getLanguage()) || StringUtils.isNotBlank(formParam.getRepository())){
+                return Objects.equals(document.getRepository().toLowerCase(), formParam.getRepository().toLowerCase());
+            }else if(StringUtils.isNotBlank(formParam.getLanguage()) || StringUtils.isBlank(formParam.getRepository())){
+                return Objects.equals(document.getLanguage().toLowerCase(), formParam.getLanguage().toLowerCase());
+            }else {
+                return true;
+            }
+        }).collect(Collectors.toList());
 
         ModelAndView modelAndView = new ModelAndView("search/jsp/searchPage.jsp");
         int indexStart = (formParam.getPageIndex() - 1) * 10;

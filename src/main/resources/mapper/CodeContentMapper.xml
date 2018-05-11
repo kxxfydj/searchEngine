@@ -2,12 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kxxfydj.mapper.CodeContentMapper">
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeContent">
-        <id column="path" jdbcType="VARCHAR" property="path"/>
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
         <result column="body" jdbcType="VARCHAR" property="body"/>
         <result column="codeinfoId" jdbcType="INTEGER" property="codeInfoId"/>
         <result column="addTime" jdbcType="TIMESTAMP" property="addTime"/>
         <result column="updateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="fatherPath" jdbcType="VARCHAR" property="fatherPath"/>
+        <result column="language" jdbcType="VARCHAR" property="language"/>
         <result column="enabled" jdbcType="TINYINT" property="enabled"/>
     </resultMap>
 
@@ -50,6 +52,9 @@
             <if test="fatherPath != null">
                 fatherPath,
             </if>
+            <if test="language != null">
+                language,
+            </if>
             <if test="enabled != null">
                 enabled
             </if>
@@ -67,6 +72,9 @@
             <if test="fatherPath != null">
                 #{fatherPath}
             </if>
+            <if test="language != null">
+                language,
+            </if>
             <if test="enabled != null">
                 #{enabled}
             </if>
@@ -78,6 +86,7 @@
         body,
         codeinfoId,
         fatherPath,
+        language,
         enabled
         )
         VALUES
@@ -87,6 +96,7 @@
             #{item.body,jdbcType=VARCHAR},
             #{item.codeInfoId,jdbcType=INTEGER},
             #{item.fatherPath,jdbcType=VARCHAR},
+            #{item.language,jdbcType=VARCHAR},
             #{item.enabled,jdbcType=TINYINT}
             )
         </foreach>
@@ -99,7 +109,6 @@
     <update id="batchUpdate" parameterType="java.util.List">
         update codecontent
         <trim prefix="set" suffixOverrides=",">
-
             <trim prefix="body =case" suffix="end,">
                 <foreach collection="list" item="item">
                     <if test="item.body!=null">
@@ -132,13 +141,14 @@
     </update>
 
     <insert id="saveOrUpdate" parameterType="java.util.List">
-        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,enabled) values
+        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,language,enabled) values
         <foreach collection="list" item="item" separator=",">
             (
             #{item.path,jdbcType=VARCHAR},
             #{item.body,jdbcType=VARCHAR},
             #{item.codeInfoId,jdbcType=INTEGER},
             #{item.fatherPath,jdbcType=VARCHAR},
+            #{item.language,jdbcType=VARCHAR},
             #{item.enabled,jdbcType=TINYINT}
             )
         </foreach>
@@ -167,12 +177,13 @@
     </insert>
 
     <insert id="saveOrUpdateOne" parameterType="com.kxxfydj.entity.CodeContent">
-        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,enabled) values
+        INSERT INTO codecontent(path,body,codeinfoId,fatherPath,language,enabled) values
             (
             #{path,jdbcType=VARCHAR},
             #{body,jdbcType=VARCHAR},
             #{codeInfoId,jdbcType=INTEGER},
             #{fatherPath,jdbcType=VARCHAR},
+            #{language,jdbcType=VARCHAR},
             #{enabled,jdbcType=TINYINT}
             )
         on DUPLICATE KEY UPDATE

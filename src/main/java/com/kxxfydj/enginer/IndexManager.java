@@ -8,6 +8,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -67,13 +68,13 @@ public class IndexManager {
                 int startindex = engineConfig.getUnzipFilePath().split("\\\\").length - 1;
                 Path filePath = Paths.get(first, others);
                 CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
-                document.add(new TextField(EngineConfig.FILENAME, filePath.getFileName().toString(), Field.Store.YES));
-                document.add(new TextField(EngineConfig.PATH, filePath.subpath(startindex, filePath.getNameCount()).toString(), Field.Store.YES));
+                document.add(new StringField(EngineConfig.FILENAME, filePath.getFileName().toString(), Field.Store.YES));
+                document.add(new StringField(EngineConfig.PATH, filePath.subpath(startindex, filePath.getNameCount()).toString(), Field.Store.YES));
                 document.add(new TextField(EngineConfig.CONTENT, codeContent.getBody(), Field.Store.YES));
-                document.add(new TextField(EngineConfig.PROJECTNAME, codeInfo.getProjectName(),Field.Store.YES));
-                document.add(new TextField(EngineConfig.GITPATH,codeInfo.getGitPath(),Field.Store.YES));
-                document.add(new TextField(EngineConfig.LANGUAGE,codeInfo.getLanguage(),Field.Store.YES));
-                document.add(new TextField(EngineConfig.REPOSITORY,codeInfo.getRepository(),Field.Store.YES));
+                document.add(new StringField(EngineConfig.PROJECTNAME, codeInfo.getProjectName(),Field.Store.YES));
+                document.add(new StringField(EngineConfig.GITPATH,codeInfo.getGitPath(),Field.Store.YES));
+                document.add(new StringField(EngineConfig.LANGUAGE,codeContent.getLanguage(),Field.Store.YES));
+                document.add(new StringField(EngineConfig.REPOSITORY,codeInfo.getRepository(),Field.Store.YES));
 
                 indexWriter.addDocument(document);
 

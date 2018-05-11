@@ -93,7 +93,7 @@ public class Worker {
                 Class<Crawler> clazz = supportCrawlerClazzMap.get(crawlerTask.getCrawlerName());
                 if (clazz == null) {
                     logger.error("not found the crawler for the crawler task!");
-                    return;
+                    continue;
                 }
                 Crawler crawler = ((Class<? extends Crawler>) clazz).newInstance();
                 crawler.setCrawlerConfig(crawlerConfig);

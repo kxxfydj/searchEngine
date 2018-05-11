@@ -79,11 +79,11 @@ public abstract class CodeProcessor implements PageProcessor {
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
         jsoupRequestData.setMaxSize(100*1024*1024); //100MB
         jsoupRequestData.setHeaders(requestHeaderMap);
-        jsoupRequestData.setTimeOut(0);  //连接最大等待5分钟
+        jsoupRequestData.setTimeOut(0);  //设置在下载底层实现中无限等待
         jsoupRequestData.setFiddlerProxy();
         Future<Boolean> f = executorService.submit(new DownloadTask(filePath,downloadPath,jsoupRequestData));
         try{
-            return f.get(5, TimeUnit.MINUTES);
+            return f.get(5, TimeUnit.MINUTES);   //外部设置等待五分钟
         }catch (Exception e){
             logger.error("文件下载超时，下载路径：{}", downloadPath);
         }

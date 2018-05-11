@@ -8,9 +8,9 @@ public class SearchParam {
 
     private int pageIndex;
 
-    private String repository;
+    private String repository = "";
 
-    private String language;
+    private String language = "";
 
     public String getClause() {
         return clause;

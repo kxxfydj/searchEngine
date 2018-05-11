@@ -6,6 +6,9 @@ import java.util.Date;
  * Created by kxxfydj on 2018/3/31.
  */
 public class CodeContent {
+
+    private int id;
+
     private String path;
 
     private String body;
@@ -18,7 +21,25 @@ public class CodeContent {
 
     private String fatherPath;
 
+    private String language;
+
     private boolean enabled;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public int getCodeInfoId() {
         return codeInfoId;

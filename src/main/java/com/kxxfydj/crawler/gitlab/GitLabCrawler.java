@@ -14,7 +14,7 @@ import us.codecraft.webmagic.Spider;
 /**
  * Created by kxxfydj on 2018/3/24.
  */
-//@Crawl(crawlerName = "gitlab")
+@Crawl(crawlerName = "gitlab")
 public class GitLabCrawler extends CrawlerBase {
 
     @Override
@@ -25,6 +25,7 @@ public class GitLabCrawler extends CrawlerBase {
                 .addHeader("Host", "gitlab.com");
 
 //        super.setProxy();
+        super.setFiddlerProxy();
         String url = "https://gitlab.com/explore/projects/" + crawlerTask.getUrlCondition();
         Request request = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
 

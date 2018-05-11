@@ -70,7 +70,7 @@ public class DownloadTest {
 //            logger.error(e.getMessage(),e);
 //        }
 //        System.out.println(System.getProperty("user.dir"));
-        downloadZip("java","ZZZZZ","https://github.com/TheAlgorithms/Java/archive/master.zip");
+        downloadZip("java","ZZZZZ","https://gitlab.com/fdroid/fdroidclient/-/archive/master/fdroidclient-master.zip");
             CreateFileUtil.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt","sdjlfsdfdsfs");
 //        Class<GitLabCrawler> clazz = GitLabCrawler.class;
 //        Constructor<?>[] constructors = clazz.getConstructors();
@@ -93,10 +93,10 @@ public class DownloadTest {
         requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
         jsoupRequestData.setFiddlerProxy();
-        jsoupRequestData.setTimeOut(50*1000);
+        jsoupRequestData.setTimeOut(0);
         jsoupRequestData.setHeaders(requestHeaderMap);
-//        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-//        CreateFileUtil.generateFile(filePath, binaryData);
+        byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+        CreateFileUtil.generateFile(filePath, binaryData);
     }
 
     @Test

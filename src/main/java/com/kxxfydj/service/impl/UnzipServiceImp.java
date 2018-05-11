@@ -1,11 +1,13 @@
 package com.kxxfydj.service.impl;
 
+import com.kxxfydj.common.FileSupportEnum;
 import com.kxxfydj.entity.CodeContent;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.service.CodeContentService;
 import com.kxxfydj.service.CodeInfoService;
 import com.kxxfydj.service.UnzipService;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +18,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.concurrent.*;
 
 /**
  * Created by kxxfydj on 2018/3/29.
@@ -33,10 +34,9 @@ public class UnzipServiceImp implements UnzipService {
     @Autowired
     private CodeInfoService codeInfoService;
 
-    private ExecutorService sqlTransactionService = Executors.newFixedThreadPool(4);
-
     @Override
     public void fileToDatabase(String repository, String filePath, boolean isUpdate) {
+        ExecutorService sqlTransactionService = new ThreadPoolExecutor(4,8,5,TimeUnit.MINUTES,new LinkedBlockingDeque<>());
         File file = new File(filePath + File.separator + repository);
         if (!file.exists() || !file.isDirectory()) {
             file.mkdirs();
@@ -48,7 +48,7 @@ public class UnzipServiceImp implements UnzipService {
                 String projectName = fileChild.getName();
                 CodeInfo codeInfo = codeInfoService.getCodeInfoByProjectNameAndRepository(projectName, repository);
                 if (codeInfo == null) {
-                    logger.error("项目文件入库时发现没有对应的codeInfo项目对应该项目，该文件不入库！项目名：{}", projectName);
+                    logger.error("项目文件入库时发现没有对应的codeInfo项目对应该项目，该文件不入库！项目名：{} 仓库：{}", projectName,repository);
                     continue;
                 }
                 if (fileChild.isDirectory()) {
@@ -56,7 +56,7 @@ public class UnzipServiceImp implements UnzipService {
                 } else {
                     handlerFileToDatabase(codeInfo, fileChild, codeContentList, false);
                 }
-                dataToDatabase(fileChild, codeContentList, isUpdate);
+                dataToDatabase(sqlTransactionService, codeContentList, isUpdate);
             }
 
             if (!isUpdate) {
@@ -72,20 +72,19 @@ public class UnzipServiceImp implements UnzipService {
 
     }
 
-    private void dataToDatabase(File fileChild, List<CodeContent> codeContentList, boolean isUpdate) {
+    private void dataToDatabase(ExecutorService sqlTransactionService, List<CodeContent> codeContentList, boolean isUpdate) {
         logger.info("codeContentList size:{}", codeContentList.size());
         int handlerSize = 500;
         for (int i = 0; i < codeContentList.size(); i += handlerSize) {
             int end = i + handlerSize;
             int start = i;
+            //文件更新的话，使用多线程，文件插入的话，使用单线程（mysql duplicate语句使用了select，会有锁，造成死锁）
             if (!isUpdate) {
                 sqlTransactionService.execute(() -> codeContentService.addFile(codeContentList.subList(start, end > codeContentList.size() ? codeContentList.size() : end)));
             } else {
                 codeContentService.saveOrUpdate(codeContentList.subList(start, end > codeContentList.size() ? codeContentList.size() : end));
             }
-
         }
-        logger.info("file:{}", fileChild.getAbsolutePath());
     }
 
     private void handlerLeafFile(CodeInfo codeInfo, File file, List<CodeContent> codeContentList) {
@@ -103,11 +102,29 @@ public class UnzipServiceImp implements UnzipService {
 
     private void handlerFileToDatabase(CodeInfo codeInfo, File file, List<CodeContent> codeContentList, boolean isRoot) {
         try (FileReader reader = new FileReader(file)) {
-            String fileString = IOUtils.toString(reader);
+            String filePath = file.getAbsolutePath();
             CodeContent codeContent = new CodeContent();
-            codeContent.setBody(fileString);
+
+            //获取文件后缀，判断文件格式
+            int suffixIndexOf = filePath.lastIndexOf(".");
+            int lastSeparatorIndexof = filePath.lastIndexOf("\\");
+            if(suffixIndexOf == -1 || lastSeparatorIndexof >= suffixIndexOf){
+                logger.info("文件没有后缀名,不保存该文件！文件名：{}",filePath);
+                return;
+            }
+            String fileSuffix = filePath.substring(suffixIndexOf, filePath.length());
+            String language = FileSupportEnum.getLanguage(fileSuffix);
+            if(!Objects.equals(language,FileSupportEnum.UnsupportFile.getLanguage())){
+                codeContent.setLanguage(language);
+            }
+
+            //读取文件内容
+            String body = IOUtils.toString(reader);
+            codeContent.setBody(body);
             codeContent.setEnabled(true);
-            codeContent.setPath(file.getAbsolutePath());
+            codeContent.setPath(filePath);
+
+            //判断是否为根目录，是根目录的话，没有parent信息
             if (!isRoot) {
                 codeContent.setFatherPath(file.getParent());
             }

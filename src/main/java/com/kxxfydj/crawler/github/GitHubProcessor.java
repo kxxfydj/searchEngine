@@ -40,7 +40,7 @@ public class GitHubProcessor extends CodeProcessor {
     private boolean hasNext = false;
 
     public GitHubProcessor(Site site, CrawlerTask crawlerTask) {
-        super(site,crawlerTask);
+        super(site, crawlerTask);
         super.host = "codeload.github.com";
         super.referer = "https://github.com";
         super.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
@@ -58,24 +58,20 @@ public class GitHubProcessor extends CodeProcessor {
             String codeLink = codeLinkTag.attr("href");
             String language = repo.child(1).text();
             Request request = RequestUtil.createGetRequest(codeLink, CommonTag.NEXT_PAGE);
-            request.putExtra("language",language);
-            synchronized (totalCount) {
-                if (totalCount.get() <= crawlerTask.getFilterCount()) {
-                    totalCount.incrementAndGet();
-                    page.addTargetRequest(request);
-                } else {
-                    hasNext = false;
-                    return;
-                }
+            request.putExtra("language", language);
+            page.addTargetRequest(request);
+            if (totalCount.incrementAndGet() >= crawlerTask.getFilterCount()) {
+                hasNext = false;
+                return;
             }
         }
         Element nextPage = document.selectFirst("#js-pjax-container > div > div.columns > div.column.three-fourths.codesearch-results > div > div.paginate-container > div > a.next_page");
         String nextUrl = nextPage.attr("href");
-        if(StringUtils.isNotBlank(nextUrl)){
+        if (StringUtils.isNotBlank(nextUrl)) {
             hasNext = true;
-            Request request = RequestUtil.createGetRequest(nextUrl,CommonTag.FIRST_PAGE);
+            Request request = RequestUtil.createGetRequest(nextUrl, CommonTag.FIRST_PAGE);
             page.addTargetRequest(request);
-        }else{
+        } else {
             hasNext = false;
         }
     }
@@ -111,8 +107,8 @@ public class GitHubProcessor extends CodeProcessor {
     }
 
     @Override
-    protected void afterDownload(boolean isSuccess,CodeInfo codeInfo) {
-        if(isSuccess){
+    protected void afterDownload(boolean isSuccess, CodeInfo codeInfo) {
+        if (isSuccess) {
             codeInfoList.add(codeInfo);
         }
         handleredCount.incrementAndGet();
@@ -120,7 +116,7 @@ public class GitHubProcessor extends CodeProcessor {
 
     @Override
     protected void checkFinished(Page page) {
-        logger.info("thread:{} totalCount:{} handleredCount:{}",Thread.currentThread(), totalCount.get() ,handleredCount.get());
+        logger.info("thread:{} totalCount:{} handleredCount:{}", Thread.currentThread(), totalCount.get(), handleredCount.get());
         if (totalCount.get() == handleredCount.get() && !hasNext) {
             page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
             page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);

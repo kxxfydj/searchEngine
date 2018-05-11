@@ -34,7 +34,6 @@ public class EngineConfig {
     @Value("#{settings['crawler.unzipfile.path']}")
     private String unzipFilePath;
 
-
     public String getZipFilePath() {
         return zipFilePath;
     }
