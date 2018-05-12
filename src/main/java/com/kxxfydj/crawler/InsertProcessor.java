@@ -7,7 +7,6 @@ import com.kxxfydj.utils.CreateFileUtil;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.HttpsUtils;
 import com.kxxfydj.utils.JsoupRequestData;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,9 @@ import java.util.concurrent.*;
 /**
  * Created by kxxfydj on 2018/3/24.
  */
-public abstract class CodeProcessor implements PageProcessor {
+public abstract class InsertProcessor implements PageProcessor {
 
-    protected static final Logger logger = LoggerFactory.getLogger(CodeProcessor.class);
+    protected static final Logger logger = LoggerFactory.getLogger(InsertProcessor.class);
 
     protected CrawlerTask crawlerTask;
 
@@ -40,10 +39,10 @@ public abstract class CodeProcessor implements PageProcessor {
 
     protected String userAgent;
 
-    public CodeProcessor(Site site, CrawlerTask crawlerTask) {
+    public InsertProcessor(Site site, CrawlerTask crawlerTask) {
         this.crawlerTask = crawlerTask;
         this.site = site;
-        this.filePath = crawlerTask.getCodeFilePath() + File.separator + crawlerTask.getCrawlerName();
+        this.filePath = crawlerTask.getCodeFilePath() + File.separator + crawlerTask.getRepository();
         executorService = Executors.newCachedThreadPool();
     }
 
@@ -52,7 +51,7 @@ public abstract class CodeProcessor implements PageProcessor {
         String type = (String) page.getRequest().getExtra(CommonTag.TYPE);
         if(CommonTag.FIRST_PAGE.equals(type)){
             processFirstPage(page);
-        }else if(CommonTag.NEXT_PAGE.equals(type)){
+        }else if(CommonTag.SECOND_PAGE.equals(type)){
             processNextPage(page);
         }
     }

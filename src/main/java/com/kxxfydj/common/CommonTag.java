@@ -15,8 +15,9 @@ public class CommonTag {
 
     public static final String FIRST_PAGE = "firstPage";
 
-    public static final String NEXT_PAGE = "nextPage";
+    public static final String SECOND_PAGE = "nextPage";
 
+    public static final String THIRD_PAGE = "thirdPage";
 
 
     public static final String ALL_BLANK = " | |    ";

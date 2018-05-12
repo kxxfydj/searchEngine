@@ -188,26 +188,5 @@
             )
         on DUPLICATE KEY UPDATE
         body = #{body},fatherPath = #{fatherPath},enabled = #{enabled};
-        <!--<trim prefix="body = case" suffix="end,">-->
-            <!--<foreach collection="list" item="item">-->
-                <!--<if test="item.path!=null">-->
-                    <!--when path=#{item.path} then #{item.body}-->
-                <!--</if>-->
-            <!--</foreach>-->
-        <!--</trim>-->
-        <!--<trim prefix="fatherPath = case" suffix="end,">-->
-            <!--<foreach collection="list" item="item">-->
-                <!--<if test="item.fatherPath!=null">-->
-                    <!--when path=#{item.path} then #{item.fatherPath}-->
-                <!--</if>-->
-            <!--</foreach>-->
-        <!--</trim>-->
-        <!--<trim prefix="enabled = case" suffix="end">-->
-            <!--<foreach collection="list" item="item">-->
-                <!--<if test="item.enabled!=null">-->
-                    <!--when path=#{item.path} then #{item.enabled}-->
-                <!--</if>-->
-            <!--</foreach>-->
-        <!--</trim>-->
     </insert>
 </mapper>

@@ -55,4 +55,9 @@ public class CodeInfoServiceImp implements CodeInfoService{
     public int saveOrUpdate(List<CodeInfo> codeInfoList) {
         return codeInfoMapper.insertOrUpdate(codeInfoList);
     }
+
+    @Override
+    public List<CodeInfo> getCodeInfoByRepository(String repository) {
+        return codeInfoMapper.selectByRepository(repository);
+    }
 }

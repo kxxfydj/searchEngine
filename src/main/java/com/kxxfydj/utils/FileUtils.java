@@ -1,14 +1,12 @@
 package com.kxxfydj.utils;
 
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -51,6 +49,38 @@ public class FileUtils {
             }
         }
         flag = flag && file.delete();
+        return flag;
+    }
+
+    /**
+     * 将String字符串更新到源文件，如果该文件不存在则新建
+     * @return 失败false;成功true
+     */
+    public static boolean updateFiles(String filePath,String content){
+        return updateFiles(filePath, content.getBytes());
+    }
+
+    /**
+     * 将二进制数据更新到源文件，如果该文件不存在则新建
+     * @return 失败false;成功true
+     */
+    public static boolean updateFiles(String filePath,byte[] content) {
+        boolean flag = true;
+        if(StringUtils.isBlank(filePath)){
+            logger.error("文件路径为空！");
+            return !flag;
+        }
+        File file = new File(filePath);
+        if(file.isDirectory()){
+            logger.error("文件路径为文件夹路径！");
+            return !flag;
+        }
+        try {
+            org.apache.commons.io.FileUtils.writeByteArrayToFile(file,content);
+        } catch (IOException e) {
+            logger.error("文件内容更新出错！",e.getMessage(),e);
+            flag = false;
+        }
         return flag;
     }
 

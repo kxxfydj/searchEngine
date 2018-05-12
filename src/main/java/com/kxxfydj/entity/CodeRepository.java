@@ -6,6 +6,9 @@ package com.kxxfydj.entity;
 public class CodeRepository {
     //id
     private int id;
+
+    private String crawlerName;
+
     //the name of repository
     private String repositoryName;
     //the count of projects
@@ -13,8 +16,27 @@ public class CodeRepository {
     // the condition of crawler
     private int filterCount;
     // the condition of url, conbine the url
-
     private String urlCondition;
+
+    private boolean isUpdate;
+
+    public String getCrawlerName() {
+        return crawlerName;
+    }
+
+    public void setCrawlerName(String crawlerName) {
+        this.crawlerName = crawlerName;
+    }
+
+    public boolean isUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
+    }
+
+
 
     public String getUrlCondition() {
         return urlCondition;

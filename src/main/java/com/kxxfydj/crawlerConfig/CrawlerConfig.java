@@ -65,6 +65,8 @@ public class CrawlerConfig {
     @Value("#{settings['crawler.unzipfile.path']}")
     private String codeunzipPath;
 
+    private String codeCommitFilePath;
+
     @Value("#{settings['crawler.proxy.switch']}")
     private boolean proxySwitch;
 

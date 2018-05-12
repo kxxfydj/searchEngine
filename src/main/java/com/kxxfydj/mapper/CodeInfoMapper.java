@@ -20,4 +20,5 @@ public interface CodeInfoMapper {
     CodeInfo selectByGitPath(String gitPath);
     CodeInfo selectByProjectNameAndRepository(@Param("projectName") String projectName,@Param("repository") String repository);
     int insertOrUpdate(List<CodeInfo> codeInfoList);
+    List<CodeInfo> selectByRepository(String repository);
 }

@@ -1,13 +1,9 @@
-import com.alibaba.fastjson.JSONObject;
-import com.kxxfydj.crawler.gitlab.GitLabCrawler;
 import com.kxxfydj.utils.CreateFileUtil;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.HttpsUtils;
 import com.kxxfydj.utils.JsoupRequestData;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +12,9 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.Enumeration;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 /**
  * Created by kxxfydj on 2018/3/2.

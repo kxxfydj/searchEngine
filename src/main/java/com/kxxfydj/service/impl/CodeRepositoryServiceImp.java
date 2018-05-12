@@ -40,4 +40,14 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     public List<CodeRepository> getAllRepostitory() {
         return codeRepositoryMapper.selectAll();
     }
+
+    @Override
+    public List<CodeRepository> getUpdateRepostitory() {
+        return codeRepositoryMapper.selectUpdate();
+    }
+
+    @Override
+    public List<CodeRepository> getInsertRepostitory() {
+        return codeRepositoryMapper.selectInsert();
+    }
 }

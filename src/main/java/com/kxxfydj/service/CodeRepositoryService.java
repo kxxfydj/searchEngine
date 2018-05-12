@@ -13,4 +13,6 @@ public interface CodeRepositoryService {
     void addRepository(CodeRepository codeRepository);
     CodeRepository getRepositoryByNameAndCondition(String repositoryName,String condition);
     int refreshCount(CodeRepository codeRepository);
+    List<CodeRepository> getUpdateRepostitory();
+    List<CodeRepository> getInsertRepostitory();
 }

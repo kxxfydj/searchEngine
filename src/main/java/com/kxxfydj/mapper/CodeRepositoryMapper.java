@@ -14,4 +14,6 @@ public interface CodeRepositoryMapper {
     CodeRepository selectByNameAndCondition(@Param("repositoryName") String repositoryName, @Param("condition") String condition);
     void insert(CodeRepository codeRepository);
     int updateCodeRepository(CodeRepository codeRepository);
+    List<CodeRepository> selectUpdate();
+    List<CodeRepository> selectInsert();
 }

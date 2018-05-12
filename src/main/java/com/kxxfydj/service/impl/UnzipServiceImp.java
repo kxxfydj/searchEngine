@@ -105,18 +105,11 @@ public class UnzipServiceImp implements UnzipService {
             String filePath = file.getAbsolutePath();
             CodeContent codeContent = new CodeContent();
 
-            //获取文件后缀，判断文件格式
-            int suffixIndexOf = filePath.lastIndexOf(".");
-            int lastSeparatorIndexof = filePath.lastIndexOf("\\");
-            if(suffixIndexOf == -1 || lastSeparatorIndexof >= suffixIndexOf){
-                logger.info("文件没有后缀名,不保存该文件！文件名：{}",filePath);
+            FileSupportEnum language = FileSupportEnum.getLanguage(filePath);
+            if(Objects.equals(language,FileSupportEnum.UnsupportFile)){
                 return;
             }
-            String fileSuffix = filePath.substring(suffixIndexOf, filePath.length());
-            String language = FileSupportEnum.getLanguage(fileSuffix);
-            if(!Objects.equals(language,FileSupportEnum.UnsupportFile.getLanguage())){
-                codeContent.setLanguage(language);
-            }
+            codeContent.setLanguage(language.getLanguage());
 
             //读取文件内容
             String body = IOUtils.toString(reader);
@@ -130,6 +123,7 @@ public class UnzipServiceImp implements UnzipService {
             }
 
             codeContent.setCodeInfoId(codeInfo.getId());
+            codeContent.setEnabled(true);
 //            codeContentService.saveOrUpdate(codeContent);
             codeContentList.add(codeContent);
         } catch (IOException e) {

@@ -2,14 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kxxfydj.mapper.CodeRepositoryMapper">
     <resultMap id="baseResultMap" type="com.kxxfydj.entity.CodeRepository">
+        <id column="id" jdbcType="INTEGER" property="id"/>
         <result column="repositoryName" jdbcType="VARCHAR" property="repositoryName"/>
         <result column="projectCount" jdbcType="INTEGER" property="projectCount"/>
+        <result column="crawlerName" jdbcType="VARCHAR" property="crawlerName"/>
         <result column="filterCount" jdbcType="INTEGER" property="filterCount"/>
         <result column="urlCondition" jdbcType="VARCHAR" property="urlCondition"/>
+        <result column="isUpdate" jdbcType="TINYINT" property="isUpdate"/>
     </resultMap>
 
     <select id="selectAll" resultMap="baseResultMap">
         SELECT * from coderepository;
+    </select>
+
+    <select id="selectUpdate" resultMap="baseResultMap">
+        SELECT * from coderepository where isUpdate = 1;
+    </select>
+
+    <select id="selectInsert" resultMap="baseResultMap">
+        SELECT * from coderepository where isUpdate = 0;
     </select>
 
     <select id="selectByName" resultMap="baseResultMap">

@@ -1,14 +1,13 @@
-package com.kxxfydj.crawler.gitlab;
+package com.kxxfydj.crawler.gitlabInsert;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.common.CrawlerTypeEnum;
 import com.kxxfydj.common.PipelineKeys;
-import com.kxxfydj.crawler.CodeProcessor;
+import com.kxxfydj.crawler.InsertProcessor;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.NumberFormatUtil;
 import com.kxxfydj.utils.RequestUtil;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by kxxfydj on 2018/3/24.
  */
-public class GitLabProcessor extends CodeProcessor {
+public class GitLabProcessor extends InsertProcessor {
 
     private AtomicInteger totalCount = new AtomicInteger(0);
 
@@ -56,7 +55,7 @@ public class GitLabProcessor extends CodeProcessor {
                 stop = true;
                 break;
             }
-            Request request = RequestUtil.createGetRequest(link, CommonTag.NEXT_PAGE);
+            Request request = RequestUtil.createGetRequest(link, CommonTag.SECOND_PAGE);
             page.addTargetRequest(request);
             if (totalCount.incrementAndGet() >= crawlerTask.getFilterCount()) {
                 return;
@@ -82,13 +81,15 @@ public class GitLabProcessor extends CodeProcessor {
         String projectName = document.select("#content-body > div.project-home-panel.text-center > div > h1").text();
         String description = document.select("#content-body > div.project-home-panel.text-center > div > div.project-home-desc > p").text();
         String downloadPath = document.select("#tree-holder > div.nav-block > div.tree-controls > div > ul > li:nth-child(2) > a").attr("href");
+        String author = document.select("body > div > div.content-wrapper > div.alert-wrapper > nav > div > div > ul > li:nth-child(1) > a").text();
 
         CodeInfo codeInfo = new CodeInfo();
         codeInfo.setStars(stars);
         codeInfo.setGitPath(gitPath);
         codeInfo.setProjectName(projectName);
         codeInfo.setDescription(description);
-        codeInfo.setRepository(crawlerTask.getCrawlerName());
+        codeInfo.setAuthor(author);
+        codeInfo.setRepository(crawlerTask.getRepository());
 
         String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
         codeInfo.setFilePath(filePath);

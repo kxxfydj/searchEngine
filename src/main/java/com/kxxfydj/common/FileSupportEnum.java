@@ -143,41 +143,28 @@ public enum FileSupportEnum {
         return language;
     }
 
-    public static String getLanguage(String originSuffix) {
-//        FileSupportEnum[] languageSupportEnums = FileSupportEnum.values();
-//        for(FileSupportEnum languageSupportEnum : languageSupportEnums){
-//            String[] suffixes = languageSupportEnum.getSuffix().split(";");
-//            for(String suffix : suffixes){
-//                if(suffix.equals(originSuffix)){
-//                    return languageSupportEnum.getLanguage();
-//                }
-//            }
-//        }
-//        return Other.getLanguage();
-        FileSupportEnum obj = suffixToLanguageMap.get(originSuffix);
-        if(obj == null){
-            return Other.getLanguage();
+    public static FileSupportEnum getLanguage(String filePath) {
+        //获取文件后缀，判断文件格式
+        int suffixIndexOf = filePath.lastIndexOf(".");
+        int lastSeparatorIndexof = filePath.lastIndexOf("\\");
+        //没有文件后缀的不支持
+        if(suffixIndexOf == -1 || lastSeparatorIndexof >= suffixIndexOf){
+            return UnsupportFile;
         }
-        return obj.getLanguage();
+        String fileSuffix = filePath.substring(suffixIndexOf, filePath.length());
+        FileSupportEnum obj = suffixToLanguageMap.get(fileSuffix);
+        if(obj == null){
+            return Other;
+        }
+        return obj;
     }
 
     public String getSuffix() {
         return suffix;
     }
 
-
     @Override
     public String toString() {
         return super.toString();
     }
-
-//    public static void main(String[] args){
-//        FileSupportEnum[] languageSupportEnums = FileSupportEnum.values();
-//        for(FileSupportEnum languageSupportEnum : languageSupportEnums){
-//            String[] suffixes = languageSupportEnum.getSuffix().split(";");
-//            for(String suffix : suffixes){
-//                System.out.println("suffixToLanguageMap.put(\"" + suffix + "\"," + languageSupportEnum.name() + ");");
-//            }
-//        }
-//    }
 }

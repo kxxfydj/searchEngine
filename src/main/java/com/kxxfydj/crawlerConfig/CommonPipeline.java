@@ -71,15 +71,22 @@ public class CommonPipeline implements Pipeline {
 
             Object object = resultItems.get(PipelineKeys.CODEINFO_LIST);
             if (object != null && object instanceof List) {
-                processCodeInfo((List<CodeInfo>) object, resultItems);
+                if (!crawlerTask.isUpdate()) {
+                    processInsertCodeInfo((List<CodeInfo>) object, resultItems);
+                }
+            }
+
+            Object codeContentListObj = resultItems.get(PipelineKeys.CODECONTENT_LIST);
+            if (codeContentListObj != null && codeContentListObj instanceof List) {
+                if (crawlerTask.isUpdate()) {
+                    processUpdateCodeContent((List<CodeContent>) codeContentListObj, resultItems);
+                }
             }
         }
     }
 
     /**
      * 持久化代理数据到数据库
-     *
-     * @param proxyList
      */
     private void processProxy(List<Proxy> proxyList) {
         int rows;
@@ -96,13 +103,26 @@ public class CommonPipeline implements Pipeline {
     }
 
     /**
-     * 持久化代码仓库数据到数据库
-     *
-     * @param codeInfoList
-     * @param resultItems
+     * 持久化更新代码仓库数据到数据库
      */
-    private void processCodeInfo(List<CodeInfo> codeInfoList, ResultItems resultItems) {
-        logger.info("{}爬取任务结束，开始信息持久化和缓存操作！",crawlerTask.getCrawlerName());
+    private void processUpdateCodeContent(List<CodeContent> codeContentList, ResultItems resultItems) {
+        logger.info("{}爬取任务完成，开始信息持久化和缓存操作！",crawlerTask.getCrawlerName());
+        long startTime = System.currentTimeMillis();
+        int rows = codeContentService.saveOrUpdate(codeContentList);
+        long endTime = System.currentTimeMillis();
+        logger.info("数据库codeContent表更新完成，共修改{}条数据，共耗时：{}毫秒",rows,endTime - startTime);
+
+        logger.info("开始文件系统文件更新");
+        for(CodeContent codeContent: codeContentList){
+            FileUtils.updateFiles(codeContent.getPath(),codeContent.getBody());
+        }
+    }
+
+    /**
+     * 持久化插入代码仓库数据到数据库
+     */
+    private void processInsertCodeInfo(List<CodeInfo> codeInfoList, ResultItems resultItems) {
+        logger.info("{}爬取任务结束，开始信息持久化和缓存操作！", crawlerTask.getCrawlerName());
         String cralwerType = resultItems.get(PipelineKeys.CRAWLER_TYPE);
 
         //初始化house的cityId
@@ -140,10 +160,10 @@ public class CommonPipeline implements Pipeline {
 
         //解压文件，并将文件保存到数据库codeContent表
         logger.info("开始解压文件！");
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath() + File.separator + crawlerTask.getCrawlerName(),
-                crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getCrawlerName());
+        FileUtils.unzipFiles(crawlerConfig.getCodezipPath() + File.separator + crawlerTask.getRepository(),
+                crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getRepository());
         logger.info("文件入库！");
-        unzipService.fileToDatabase(crawlerTask.getCrawlerName(), crawlerConfig.getCodeunzipPath(), false);
+        unzipService.fileToDatabase(crawlerTask.getRepository(), crawlerConfig.getCodeunzipPath(), false);
 
         //开始生成搜索全文索引
         logger.info("开始生成搜索全文索引");
@@ -152,6 +172,7 @@ public class CommonPipeline implements Pipeline {
         IndexManager indexManager = new IndexManager(engineConfig);
         indexManager.createIndex(codeContentList, redisUtil);
         endTime = System.currentTimeMillis();
-        logger.info("搜索全文索引生成完成，共耗时：{}毫秒",endTime - startTime);
+        logger.info("搜索全文索引生成完成，共耗时：{}毫秒", endTime - startTime);
+        logger.info("{}任务完成！", crawlerTask.getCrawlerName());
     }
 }

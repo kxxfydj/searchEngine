@@ -7,6 +7,8 @@ public class PipelineKeys {
     /** 数据库入库对象类型 */
     public static final String CODEINFO_LIST = "codeInfoList";
 
+    public static final String CODECONTENT_LIST = "codeContentList";
+
     public static final String PROXY_LIST = "proxyList";
 
     public static final String CRAWLER_TYPE = "crawlerType";

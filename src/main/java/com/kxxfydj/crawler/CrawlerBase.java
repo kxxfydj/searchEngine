@@ -33,7 +33,6 @@ public abstract class CrawlerBase implements Crawler {
     }
 
     public CrawlerBase(){
-//        site = Site.me().setSleepTime();
     }
 
     @Override

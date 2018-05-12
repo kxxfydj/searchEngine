@@ -11,6 +11,26 @@ public class CrawlerTask {
 
     private String urlCondition;
 
+    private String repository;
+
+    private boolean isUpdate;
+
+    public String getRepository() {
+        return repository;
+    }
+
+    public void setRepository(String repository) {
+        this.repository = repository;
+    }
+
+    public boolean isUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
+    }
+
     private int filterCount = Integer.MAX_VALUE;
 
     public int getFilterCount() {

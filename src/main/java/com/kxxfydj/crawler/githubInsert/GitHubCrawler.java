@@ -1,4 +1,4 @@
-package com.kxxfydj.crawler.github;
+package com.kxxfydj.crawler.githubInsert;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.crawler.CrawlerBase;
@@ -9,16 +9,13 @@ import com.kxxfydj.crawlerConfig.MyQueueScheduler;
 import com.kxxfydj.crawlerConfig.annotation.Crawl;
 import com.kxxfydj.utils.RequestUtil;
 import com.kxxfydj.utils.URLUtil;
-import org.apache.http.client.utils.URLEncodedUtils;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
-
-import java.net.URLEncoder;
 
 /**
  * create by kaiming_xu on 2017/9/2
  */
-@Crawl(crawlerName = "github")
+@Crawl(crawlerName = "githubInsert")
 public class GitHubCrawler extends CrawlerBase {
 
     @Override

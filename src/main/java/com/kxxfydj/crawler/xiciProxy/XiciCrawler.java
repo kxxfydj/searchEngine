@@ -2,7 +2,6 @@ package com.kxxfydj.crawler.xiciProxy;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.crawler.CrawlerBase;
-import com.kxxfydj.crawler.github.GitHubProcessor;
 import com.kxxfydj.crawlerConfig.CommonPipeline;
 import com.kxxfydj.crawlerConfig.CrawlerListener;
 import com.kxxfydj.crawlerConfig.MyHttpClientDownloader;
@@ -11,7 +10,6 @@ import com.kxxfydj.crawlerConfig.annotation.Crawl;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.RequestUtil;
 import us.codecraft.webmagic.Request;
-import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 
 import java.util.Map;

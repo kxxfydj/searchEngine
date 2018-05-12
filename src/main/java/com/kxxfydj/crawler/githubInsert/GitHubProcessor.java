@@ -1,21 +1,18 @@
-package com.kxxfydj.crawler.github;
+package com.kxxfydj.crawler.githubInsert;
 
 import com.kxxfydj.common.CommonTag;
 import com.kxxfydj.common.CrawlerTypeEnum;
 import com.kxxfydj.common.PipelineKeys;
-import com.kxxfydj.crawler.CodeProcessor;
+import com.kxxfydj.crawler.InsertProcessor;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.NumberFormatUtil;
 import com.kxxfydj.utils.RequestUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
@@ -23,13 +20,12 @@ import us.codecraft.webmagic.Site;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * create by kaiming_xu on 2017/9/2
  */
-public class GitHubProcessor extends CodeProcessor {
+public class GitHubProcessor extends InsertProcessor {
 
     private List<CodeInfo> codeInfoList = new ArrayList<>();
 
@@ -57,7 +53,7 @@ public class GitHubProcessor extends CodeProcessor {
             Element codeLinkTag = repo.getElementsByTag("a").first();
             String codeLink = codeLinkTag.attr("href");
             String language = repo.child(1).text();
-            Request request = RequestUtil.createGetRequest(codeLink, CommonTag.NEXT_PAGE);
+            Request request = RequestUtil.createGetRequest(codeLink, CommonTag.SECOND_PAGE);
             request.putExtra("language", language);
             page.addTargetRequest(request);
             if (totalCount.incrementAndGet() >= crawlerTask.getFilterCount()) {
