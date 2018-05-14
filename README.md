@@ -1,0 +1,4 @@
+# searchEngine
+毕业设计
+
+基于Lucene的搜索引擎，自实现爬虫对github、gitlab代码库中的代码进行爬取，爬虫框架采用webmagic框架，底层https访问封装工具采用jsoup封装。数据库采用mysql
