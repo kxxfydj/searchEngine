@@ -6,6 +6,7 @@ import com.kxxfydj.entity.CodeRepository;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.service.CodeRepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,11 @@ public class CrawlerCodeTask {
     @Autowired
     CodeRepositoryService codeRepositoryService;
 
+    @Value("#{settings['crawler.crawlerCode.hasCrawlered']}")
+    private boolean hasCrawlered;
+
     public void crawlerCode() {
+        hasCrawlered = true;
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getInsertRepostitory();
         List<CrawlerTask> crawlerTaskList = generateCrawlerTasks(codeRepositoryList);
         worker.start(crawlerTaskList);
@@ -35,9 +40,14 @@ public class CrawlerCodeTask {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void updateCode() {
+        if (!hasCrawlered) {
+            crawlerCode();
+            return;
+        }
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getUpdateRepostitory();
         List<CrawlerTask> crawlerTaskList = generateCrawlerTasks(codeRepositoryList);
         worker.start(crawlerTaskList);
+
     }
 
     private List<CrawlerTask> generateCrawlerTasks(List<CodeRepository> codeRepositoryList) {
