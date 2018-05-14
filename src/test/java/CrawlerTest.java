@@ -57,7 +57,7 @@ public class CrawlerTest {
 //        worker.start();
 //        redisUtil.lSet("testKey","testValue");
 //        redisUtil.set("kaikai","name");
-        task.CrawlerCode();
+        task.updateCode();
     }
 
     @Test

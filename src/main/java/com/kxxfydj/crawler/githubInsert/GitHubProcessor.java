@@ -114,7 +114,6 @@ public class GitHubProcessor extends InsertProcessor {
     protected void checkFinished(Page page) {
         logger.info("thread:{} totalCount:{} handleredCount:{}", Thread.currentThread(), totalCount.get(), handleredCount.get());
         if (totalCount.get() == handleredCount.get() && !hasNext) {
-            page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITHUB.getType());
             page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
             page.putField(PipelineKeys.FINISHED, true);
         }

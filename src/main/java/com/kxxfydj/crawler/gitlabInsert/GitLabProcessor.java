@@ -110,7 +110,6 @@ public class GitLabProcessor extends InsertProcessor {
         logger.info("thread:{} totalCount:{} handleredCount:{}", Thread.currentThread(), totalCount.get(), handlerdCount.get());
         if (totalCount.get() == handlerdCount.get()) {
             page.putField(PipelineKeys.CODEINFO_LIST, codeInfoList);
-            page.putField(PipelineKeys.CRAWLER_TYPE, CrawlerTypeEnum.GITLAB.getType());
             page.putField(PipelineKeys.FINISHED, true);
         }
     }

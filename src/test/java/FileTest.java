@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.regex.Matcher;
 
 /**
  * Created by kxxfydj on 2018/4/1.
@@ -52,6 +53,6 @@ public class FileTest {
 
     @Test
     public void fileToDataBase(){
-        System.out.println("../searchResource/searchFile.html?filePath=gitlab\\gitlab-runner\\gitlab-runner-master\\vendor\\k8s.io\\kubernetes\\plugin\\pkg\\auth\\authenticator\\request\\union\\<strong>unionauth_test.go</strong>".replaceAll("</?strong>",""));
+        System.out.println("/dflsfjds/sjdljfls.jdfi".replaceAll("/", Matcher.quoteReplacement(File.separator) ));
     }
 }

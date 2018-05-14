@@ -23,8 +23,11 @@
         SELECT * from coderepository where isUpdate = 0;
     </select>
 
-    <select id="selectByName" resultMap="baseResultMap">
-        SELECT * from coderepository where repositoryName = #{repositoryName};
+    <select id="selectByNameAndCrawlerNameAndUrlCondition" resultMap="baseResultMap">
+        SELECT * from coderepository where repositoryName = #{repository} and crawlerName = #{crawlerName}
+         <if test="urlCondition != null">
+             AND urlCondition = #{urlCondition};
+         </if>
     </select>
 
     <insert id="insert" parameterType="com.kxxfydj.entity.CodeRepository">

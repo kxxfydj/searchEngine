@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface CodeRepositoryService {
     List<CodeRepository> getAllRepostitory();
-    CodeRepository getRepositoryByName(String repositoryName);
+    CodeRepository getByNameAndCrawlerNameAndUrlCondition(String repository ,String crawlerName,String urlCondition);
     void addRepository(CodeRepository codeRepository);
     CodeRepository getRepositoryByNameAndCondition(String repositoryName,String condition);
     int refreshCount(CodeRepository codeRepository);

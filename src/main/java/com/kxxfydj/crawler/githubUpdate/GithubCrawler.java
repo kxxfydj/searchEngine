@@ -36,7 +36,7 @@ public class GithubCrawler extends CrawlerBase {
             CodeInfo codeInfo = codeInfoList.get(i);
             String author = codeInfo.getAuthor();
             String projectName = codeInfo.getProjectName();
-            String url = "https://github.com/" + author + "/" + projectName + "/commits/master";
+            String url = "https://github.com/" + author + "/" + projectName;
             url = URLUtil.encode(url,"UTF-8");
             requests[i] = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
         }

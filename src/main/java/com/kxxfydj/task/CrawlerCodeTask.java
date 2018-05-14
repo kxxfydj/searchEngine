@@ -27,14 +27,14 @@ public class CrawlerCodeTask {
     @Autowired
     CodeRepositoryService codeRepositoryService;
 
-    public void CrawlerCode() {
+    public void crawlerCode() {
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getInsertRepostitory();
         List<CrawlerTask> crawlerTaskList = generateCrawlerTasks(codeRepositoryList);
         worker.start(crawlerTaskList);
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
-    public void UpdateCode() {
+    public void updateCode() {
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getUpdateRepostitory();
         List<CrawlerTask> crawlerTaskList = generateCrawlerTasks(codeRepositoryList);
         worker.start(crawlerTaskList);

@@ -91,15 +91,15 @@ public class FileUtils {
      * @return 成功返回true，如果其中任何一个文件解压失败，返回false
      */
     public static boolean unzipFiles(String filePath, String unzipPath) {
-        File fatherFile = new File(filePath);
+        File file = new File(filePath);
         boolean flag = true;
-        if (fatherFile.isFile()) {
-            if (fatherFile.getAbsolutePath().endsWith(".zip")) {
+        if (file.isFile()) {
+            if (file.getAbsolutePath().endsWith(".zip")) {
                 flag = flag && unzip(filePath, unzipPath, true);
                 //unzip(filePath, filePath, true)
             }
         }
-        File[] childFiles = fatherFile.listFiles();
+        File[] childFiles = file.listFiles();
         for (File childFile : childFiles) {
             if (childFile.isFile() && childFile.getAbsolutePath().endsWith(".zip")) {
                 flag = flag && unzip(childFile.getAbsolutePath(), unzipPath, true);

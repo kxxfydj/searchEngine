@@ -13,6 +13,8 @@ public class CommonTag {
 
     public static final String ZIP_DOWNLOAD = "zipDownload";
 
+    public static final String FORTH_PAGE = "fourthPage";
+
     public static final String FIRST_PAGE = "firstPage";
 
     public static final String SECOND_PAGE = "nextPage";

@@ -7,6 +7,7 @@ import com.kxxfydj.crawlerConfig.CommonPipeline;
 import com.kxxfydj.crawlerConfig.CrawlerListener;
 import com.kxxfydj.crawlerConfig.MyHttpClientDownloader;
 import com.kxxfydj.crawlerConfig.MyQueueScheduler;
+import com.kxxfydj.crawlerConfig.annotation.Crawl;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.service.CodeInfoService;
 import com.kxxfydj.utils.ApplicationContextUtils;
@@ -20,6 +21,7 @@ import java.util.List;
 /**
  * Created by kxxfydj on 2018/5/12.
  */
+@Crawl(crawlerName = "gitlabUpdate")
 public class GitlabCrawler extends CrawlerBase {
     @Override
     public void crawler() {
@@ -33,23 +35,23 @@ public class GitlabCrawler extends CrawlerBase {
         List<CodeInfo> codeInfoList = codeInfoService.getCodeInfoByRepository("gitlab");
         Request[] requests = new Request[codeInfoList.size()];
 
-        for(int i = 0; i < codeInfoList.size(); i++){
+        for (int i = 0; i < codeInfoList.size(); i++) {
             CodeInfo codeInfo = codeInfoList.get(i);
             String author = codeInfo.getAuthor();
             String projectName = codeInfo.getProjectName();
-            String url = "https://gitlab.com/" + author + "/" + projectName + "/commits/master";
-            url = URLUtil.encode(url,"UTF-8");
+            String url = "https://gitlab.com/" + author + "/" + projectName;
+            url = URLUtil.encode(url, "UTF-8");
             requests[i] = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
         }
 
         super.setFiddlerProxy();
         Spider spider = Spider
-                .create(new GitLabProcessor(site,this.crawlerTask))
+                .create(new GitLabProcessor(site, this.crawlerTask))
                 .setDownloader(new MyHttpClientDownloader(this))
                 .addRequest(requests)
                 .setScheduler(new MyQueueScheduler())
                 .thread(crawlerConfig.getSpiderThreadSize())
-                .addPipeline(new CommonPipeline(this.crawlerTask,crawlerConfig));
+                .addPipeline(new CommonPipeline(this.crawlerTask, crawlerConfig));
 
         new CrawlerListener(spider);
         spider.start();

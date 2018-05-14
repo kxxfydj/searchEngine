@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -99,7 +100,7 @@ public class CrawlerConfig {
 
         try {
             //扫描任务包
-            String path = crawlPackage.replaceAll("\\.", "\\" + File.separator);
+            String path = crawlPackage.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
             Resource resource = new ClassPathResource(path);
             File resourceFile = resource.getFile();
             //去除不是包的文件

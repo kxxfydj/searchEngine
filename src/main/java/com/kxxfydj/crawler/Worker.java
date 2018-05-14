@@ -90,7 +90,7 @@ public class Worker {
             for(CrawlerTask crawlerTask : crawlerTaskList) {
                 //扫描指定包下的crawler任务,然后加入线程池任务队列
                 Map<String, Class<Crawler>> supportCrawlerClazzMap = crawlerConfig.getSupportCrawlerClazzMap();
-                Class<Crawler> clazz = supportCrawlerClazzMap.get(crawlerTask.getRepository());
+                Class<Crawler> clazz = supportCrawlerClazzMap.get(crawlerTask.getCrawlerName());
                 if (clazz == null) {
                     logger.error("not found the crawler for the crawler task!");
                     continue;

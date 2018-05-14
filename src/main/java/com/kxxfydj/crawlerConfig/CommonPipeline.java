@@ -72,14 +72,14 @@ public class CommonPipeline implements Pipeline {
             Object object = resultItems.get(PipelineKeys.CODEINFO_LIST);
             if (object != null && object instanceof List) {
                 if (!crawlerTask.isUpdate()) {
-                    processInsertCodeInfo((List<CodeInfo>) object, resultItems);
+                    processInsertCodeInfo((List<CodeInfo>) object);
                 }
             }
 
             Object codeContentListObj = resultItems.get(PipelineKeys.CODECONTENT_LIST);
             if (codeContentListObj != null && codeContentListObj instanceof List) {
                 if (crawlerTask.isUpdate()) {
-                    processUpdateCodeContent((List<CodeContent>) codeContentListObj, resultItems);
+                    processUpdateCodeContent((List<CodeContent>) codeContentListObj);
                 }
             }
         }
@@ -105,7 +105,7 @@ public class CommonPipeline implements Pipeline {
     /**
      * 持久化更新代码仓库数据到数据库
      */
-    private void processUpdateCodeContent(List<CodeContent> codeContentList, ResultItems resultItems) {
+    private void processUpdateCodeContent(List<CodeContent> codeContentList) {
         logger.info("{}爬取任务完成，开始信息持久化和缓存操作！",crawlerTask.getCrawlerName());
         long startTime = System.currentTimeMillis();
         int rows = codeContentService.saveOrUpdate(codeContentList);
@@ -121,40 +121,44 @@ public class CommonPipeline implements Pipeline {
     /**
      * 持久化插入代码仓库数据到数据库
      */
-    private void processInsertCodeInfo(List<CodeInfo> codeInfoList, ResultItems resultItems) {
+    private void processInsertCodeInfo(List<CodeInfo> codeInfoList) {
         logger.info("{}爬取任务结束，开始信息持久化和缓存操作！", crawlerTask.getCrawlerName());
-        String cralwerType = resultItems.get(PipelineKeys.CRAWLER_TYPE);
 
         //初始化house的cityId
-        int rows;
-        long startTime = System.currentTimeMillis();
-
-        CodeRepository codeRepository = codeRepositoryService.getRepositoryByName(cralwerType);
+        CodeRepository codeRepository = codeRepositoryService.getByNameAndCrawlerNameAndUrlCondition(crawlerTask.getRepository(),crawlerTask.getCrawlerName(),crawlerTask.getUrlCondition());
         int codeRepositoryId = codeRepository.getId();
-        int count = 0;
         for (CodeInfo codeInfo : codeInfoList) {
             codeInfo.setRepositoryId(codeRepositoryId);
-            count++;
         }
 
+        int rows;
+
         //更新codeRepository表
-        codeRepository.setProjectCount(count);
+        codeRepository.setProjectCount(codeInfoList.size());
         rows = codeRepositoryService.refreshCount(codeRepository);
         logger.info("更新coderepository表{}条数据", rows);
 
+        //如果没有下载到项目，则中断返回，不做后续处理
+        if(codeInfoList.isEmpty()){
+            logger.info("{}下载任务中，下载的项目数为0！",crawlerTask.getCrawlerName());
+            return;
+        }
+
         //更新codeInfo表
+        long startTime = System.currentTimeMillis();
         rows = codeInfoService.saveOrUpdate(codeInfoList);
         long endTime = System.currentTimeMillis();
         logger.info("codeInfo表数据更新完成! 共插入{}条数据!共耗时:{}毫秒!", rows, endTime - startTime);
 
         //从数据库中重新读取codeInfo信息，更新codeinfo对象中的id信息
-        codeInfoList = codeInfoService.getAllCodeInfo();
+        codeInfoList = codeInfoService.getCodeInfoByRepository(crawlerTask.getRepository());
 
         //更新redis缓存
         List<String> codeInfoKeys = new ArrayList<>();
         for (CodeInfo codeInfo : codeInfoList) {
             codeInfoKeys.add(RedisKeys.CODEINFOID.getKey() + ":" + codeInfo.getId());
         }
+
         redisUtil.setForBatch(codeInfoKeys, codeInfoList);
         logger.info("codeInfo对象缓存到redis中！共{}条", codeInfoKeys.size());
 

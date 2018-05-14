@@ -1,4 +1,4 @@
-package com.kxxfydj.view.controller;
+package com.kxxfydj.controller;
 
 import com.kxxfydj.form.HitDocument;
 import com.kxxfydj.form.SearchParam;

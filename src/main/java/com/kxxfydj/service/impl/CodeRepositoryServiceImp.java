@@ -17,11 +17,6 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     CodeRepositoryMapper codeRepositoryMapper;
 
     @Override
-    public CodeRepository getRepositoryByName(String repositoryName) {
-        return codeRepositoryMapper.selectByName(repositoryName);
-    }
-
-    @Override
     public void addRepository(CodeRepository codeRepository) {
         codeRepositoryMapper.insert(codeRepository);
     }
@@ -49,5 +44,10 @@ public class CodeRepositoryServiceImp implements CodeRepositoryService {
     @Override
     public List<CodeRepository> getInsertRepostitory() {
         return codeRepositoryMapper.selectInsert();
+    }
+
+    @Override
+    public CodeRepository getByNameAndCrawlerNameAndUrlCondition(String repository, String crawlerName,String urlCondition) {
+        return codeRepositoryMapper.selectByNameAndCrawlerNameAndUrlCondition(repository,crawlerName,urlCondition);
     }
 }

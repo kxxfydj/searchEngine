@@ -1,4 +1,4 @@
-package com.kxxfydj.view.controller;
+package com.kxxfydj.controller;
 
 import com.kxxfydj.common.RedisKeys;
 import com.kxxfydj.crawlerConfig.CrawlerConfig;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.List;
 

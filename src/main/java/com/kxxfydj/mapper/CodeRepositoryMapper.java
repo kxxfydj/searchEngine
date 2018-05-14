@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface CodeRepositoryMapper {
     List<CodeRepository> selectAll();
-    CodeRepository selectByName(String repositoryName);
+    CodeRepository selectByNameAndCrawlerNameAndUrlCondition(@Param("repository") String repository,@Param("crawlerName") String crawlerName, @Param("urlCondition") String urlCondition);
     CodeRepository selectByNameAndCondition(@Param("repositoryName") String repositoryName, @Param("condition") String condition);
     void insert(CodeRepository codeRepository);
     int updateCodeRepository(CodeRepository codeRepository);

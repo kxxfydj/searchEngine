@@ -52,7 +52,7 @@
         select * from codeinfo;
     </select>
 
-    <select id="selectByReository" resultMap="baseResultMap">
+    <select id="selectByRepository" resultMap="baseResultMap">
         select * from codeinfo WHERE repository = #{repository};
     </select>
 
