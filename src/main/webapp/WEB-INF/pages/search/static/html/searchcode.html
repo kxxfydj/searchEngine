@@ -10,18 +10,18 @@
           content="searchcode is a free source code and documentation search engine. API documentation, code snippets and open source (free sofware) repositories are indexed and searchable.">
     <link rel="shortcut icon" href="https://searchcode.com/static/favicon.ico" type="image/x-icon">
     <title>searchcode | source code search engine</title>
-    <link href="../search/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../search/static/css/style.css" rel="stylesheet">
-    <link href="../search/static/css/jquery.nouislider.css" rel="stylesheet">
+    <link href="./search/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./search/static/css/style.css" rel="stylesheet">
+    <link href="./search/static/css/jquery.nouislider.css" rel="stylesheet">
     <link rel="search" type="application/opensearchdescription+xml" title="searchcode"
           href="https://addons.mozilla.org/firefox/downloads/latest/570226/addon-570226-latest.xml">
     <script type="text/javascript"></script>
-    <script src="../search/static/js/jquery-1.11.1.min.js"></script>
-    <script id="_carbonads_projs" type="text/javascript" src="../search/static/json/C6AILKT.json"></script>
+    <script src="./search/static/js/jquery-1.11.1.min.js"></script>
+    <script id="_carbonads_projs" type="text/javascript" src="./search/static/json/C6AILKT.json"></script>
 </head>
 <body>
 
-<div style="background-image: url(../search/static/img/photo_4.jpeg); background-size:cover; background-repeat: no-repeat; height:100">
+<div style="background-image: url(./search/static/img/photo_4.jpeg); background-size:cover; background-repeat: no-repeat; height:100">
     <nav class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -32,7 +32,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="https://searchcode.com/">
-                <img height="24px" src="../search/static/img/searchcode_logo.png">
+                <img height="24px" src="./search/static/img/searchcode_logo.png">
             </a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -56,8 +56,9 @@
                 <div class="white repocount" style="margin-top: 20px;
             background: rgba(0, 0, 0, 0.8);
             border-radius: 5px;
-            padding: 5px;"><span style="font-size: 1.2em; color: white; margin-bottom:10px;">Search over 20 billion lines of code from 7,000,000 projects</span>
-                    <script async="" type="text/javascript" src="../search/static/js/carbon.js" id="_carbonads_js"></script>
+            padding: 5px;"><span style="font-size: 1.2em; color: white; margin-bottom:10px;">Search from github and gitlab repositories</span>
+                    <script async="" type="text/javascript" src="./search/static/js/carbon.js"
+                            id="_carbonads_js"></script>
                     <style>#carbonads {
                         margin: 0 auto;
                         padding: 1em;
@@ -101,13 +102,51 @@
 
 <div class="container">
     <div class="jumbotron">
-        <h3><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search code from over 7,000,000
-            projects.</h3>
-        <p>Search over projects from <a href="https://github.com/">Github</a>,<a href="https://gitlab.com/">GitLab</a>
-            and more.</p>
-        <p><br>
-            <img src="../search/static/img/screenshot.png" class="img-responsive">
+        <h3><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search over projects from <a
+                href="https://github.com/">Github</a>,<a href="https://gitlab.com/">GitLab</a></h3>
+        <p>
+            本系统提供的查询条件是：
+        <table class="table">
+            <tr>
+                <td>field域</td>
+                <td>对应的内容</td>
+            </tr>
+            <tbody>
+            <tr>
+                <td>fileName</td>
+                <td>文件名</td>
+            </tr>
+            <tr>
+                <td>content</td>
+                <td>文件内容</td>
+            </tr>
+            <tr>
+                <td>path</td>
+                <td>文件路径</td>
+            </tr>
+            <tr>
+                <td>gitPath</td>
+                <td>git链接地址</td>
+            </tr>
+            <tr>
+                <td>projectName</td>
+                <td>项目名</td>
+            </tr>
+            <tbody/>
+        </table>
+        一个查询语句的前缀应该是：
+        一个加号或者一个减号，分别代表这个word被查询文件包含和不包含; 或<br/>
+        一个term后面包含:号,代表这个field将被搜索.可以同时搜索多个field.<br/>
+        一个查询语句也可以是：<br/>
+        一个嵌套查询，闭包于括号中。请注意，这可以使用+/-前缀来要求任何一组术语。<br/>
+        因此, 在BNF范式中,查询语句的语法应该是:<br/>
+        Query ::= ( Clause )*<br/>
+        Clause ::= ["+", "-"] [&lt;TERM&gt; ":"] ( &lt;TERM&gt; | "(" Query ")" );<br/>
+        注意：含有特殊符号的查询，如: " ' < > + 需要使用\转移！
         </p>
+        <!--<p><br>-->
+        <!--<img src="./search/static/img/screenshot.png" class="img-responsive">-->
+        <!--</p>-->
     </div>
 
 
@@ -124,10 +163,10 @@
 
 
         <p>searchcode is proudly Made in kxxfydj | © kxxfydj 2018</p>
-        <script async="" src="../search/static/js/script.js"></script>
-        <script async="" src="../search/static/js/jquery.nouislider.min.js"></script>
-        <script async="" src="../search/static/js/bootstrap.min.js"></script>
-        <script async="" src="../search/static/js/typeahead.bundle.min.js"></script>
+        <script async="" src="./search/static/js/script.js"></script>
+        <script async="" src="./search/static/js/jquery.nouislider.min.js"></script>
+        <script async="" src="./search/static/js/bootstrap.min.js"></script>
+        <script async="" src="./search/static/js/typeahead.bundle.min.js"></script>
     </div>
 </div>
 

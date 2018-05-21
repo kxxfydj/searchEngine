@@ -10,6 +10,7 @@ import java.util.List;
 public interface CodeContentService {
 
     List<CodeContent> getAllFiles();
+    void truncateTable();
     List<CodeContent> getFileChildren(String path);
     CodeContent getFileFather(String path);
     CodeContent getFile(String path);

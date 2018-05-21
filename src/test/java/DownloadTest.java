@@ -1,4 +1,4 @@
-import com.kxxfydj.utils.CreateFileUtil;
+import com.kxxfydj.utils.FileUtils;
 import com.kxxfydj.utils.HeaderUtils;
 import com.kxxfydj.utils.HttpsUtils;
 import com.kxxfydj.utils.JsoupRequestData;
@@ -29,9 +29,9 @@ public class DownloadTest {
 
     String PROJECT_PATH = "D:\\codeSource";
 
-    private static final String HOST = "codeload.github.com";
+    private static final String HOST = "gitlab.com";
 
-    private static final String REFERER = "https://github.com";
+    private static final String REFERER = "https://gitlab.com";
 
     private static final String USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
 
@@ -58,8 +58,8 @@ public class DownloadTest {
 //            logger.error(e.getMessage(),e);
 //        }
 //        System.out.println(System.getProperty("user.dir"));
-        downloadZip("java","ZZZZZ","https://gitlab.com/fdroid/fdroidclient/-/archive/master/fdroidclient-master.zip");
-            CreateFileUtil.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt","sdjlfsdfdsfs");
+        downloadZip("java", "ZZZZZ", "https://gitlab.com/gitlab-org/gitlab-ce/-/archive/master/gitlab-ce-master.zip");
+        FileUtils.generateFile("D:\\codeSource\\github\\Java\\zzzz.txt", "sdjlfsdfdsfs");
 //        Class<GitLabCrawler> clazz = GitLabCrawler.class;
 //        Constructor<?>[] constructors = clazz.getConstructors();
 //        for(Constructor<?> constructor : constructors){
@@ -67,7 +67,6 @@ public class DownloadTest {
 //        }
 
     }
-
 
 
     private void downloadZip(String language, String projectName, String downloadPath) {
@@ -80,11 +79,11 @@ public class DownloadTest {
         Map<String, String> requestHeaderMap;
         requestHeaderMap = HeaderUtils.initGetHeaders(HOST, REFERER, USERAGENT);
         JsoupRequestData jsoupRequestData = new JsoupRequestData();
-        jsoupRequestData.setFiddlerProxy();
+//        jsoupRequestData.setFiddlerProxy();
         jsoupRequestData.setTimeOut(0);
         jsoupRequestData.setHeaders(requestHeaderMap);
         byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-        CreateFileUtil.generateFile(filePath, binaryData);
+        FileUtils.generateFile(filePath, binaryData);
     }
 
     @Test
@@ -114,7 +113,7 @@ public class DownloadTest {
             String url = "https://codeload.github.com/TheAlgorithms/Java/zip/master";
 
             Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 8888));
-            Map<String,String> header = HeaderUtils.initGetHeaders("codeload.github.com","https://github.com","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
+            Map<String, String> header = HeaderUtils.initGetHeaders("codeload.github.com", "https://github.com", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36");
 
             Connection.Response response = Jsoup //
                     .connect(url) //
@@ -136,14 +135,14 @@ public class DownloadTest {
 
 
     @Test
-    public void testaaa(){
+    public void testaaa() {
         ThreadMM threadMM = new ThreadMM();
         Thread aa = new Thread(threadMM);
         threadMM.start();
         aa.start();
     }
 
-    class ThreadMM extends Thread implements Runnable{
+    class ThreadMM extends Thread implements Runnable {
         @Override
         public void run() {
             System.out.println("thread:" + Thread.currentThread().getName());

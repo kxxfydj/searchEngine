@@ -19,13 +19,13 @@ public class CheckProxyTask {
     @Autowired
     ProxyCenter proxyCenter;
 
-    @Scheduled(cron = "0 0 /6 * * ?")
+//    @Scheduled(cron = "0 0 0/1 * * ?")
     public void checkDatabase() {
         ProxyCheck proxyCheck = new ProxyCheck(proxyService, proxyCenter);
         proxyCheck.checkProxiesFromDatabase();
     }
 
-    @Scheduled(cron = "0 0 /2 * * ?")
+//    @Scheduled(cron = "0 0/30 * * * ?")
     public void checkRedis(){
         ProxyCheck proxyCheck = new ProxyCheck(proxyService, proxyCenter);
         proxyCheck.checkProxiesFromRedisCache();

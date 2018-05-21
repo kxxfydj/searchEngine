@@ -23,6 +23,11 @@ public class CodeContentServiceImp implements CodeContentService {
     }
 
     @Override
+    public void truncateTable() {
+        codeContentMapper.truncateTable();
+    }
+
+    @Override
     public List<CodeContent> getFileChildren(String path) {
         return filterContentByDate(codeContentMapper.selectChildren(path));
     }

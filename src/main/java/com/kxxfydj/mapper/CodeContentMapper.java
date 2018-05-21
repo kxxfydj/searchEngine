@@ -9,7 +9,6 @@ import java.util.List;
  */
 public interface CodeContentMapper {
     List<CodeContent> selectAll();
-
     List<CodeContent> selectChildren(String path);
     CodeContent selectFather(String path);
     CodeContent selectFile(String filePath);
@@ -23,4 +22,6 @@ public interface CodeContentMapper {
 
     int update(CodeContent codeContent);
     int batchUpdate(List<CodeContent> codeContentList);
+
+    void truncateTable();
 }

@@ -17,6 +17,10 @@
         SELECT * from codecontent;
     </select>
 
+    <select id="truncateTable">
+        truncate table codecontent;
+    </select>
+
     <select id="selectFileByCodeInfoId" resultType="java.lang.String">
         SELECT path from codecontent where codeinfoId = #{codeInfoId};
     </select>

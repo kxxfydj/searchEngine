@@ -75,7 +75,7 @@ public abstract class UpdateProcessor implements PageProcessor {
         jsoupRequestData.setMaxSize(100 * 1024); //100KB
         jsoupRequestData.setHeaders(requestHeaderMap);
         jsoupRequestData.setTimeOut(0);  //设置在下载底层实现中无限等待
-        jsoupRequestData.setFiddlerProxy();
+//        jsoupRequestData.setFiddlerProxy();
         String fileContent = HttpsUtils.get(url, jsoupRequestData, null);
 
         generateCodeContent(page, fileContent);

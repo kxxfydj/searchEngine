@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -61,10 +62,7 @@ public class CrawlerConfig {
     private Boolean debugSwitch;
 
     @Value("#{settings['crawler.codefile.path']}")
-    private String codezipPath;
-
-    @Value("#{settings['crawler.unzipfile.path']}")
-    private String codeunzipPath;
+    private String codePath;
 
     private String codeCommitFilePath;
 
@@ -114,7 +112,7 @@ public class CrawlerConfig {
                     try {
                         //对任务包下的所有类文件加载
                         String classFileName = classFile.getName();
-                        String classFileNamePrefix = classFileName.substring(0, classFileName.lastIndexOf(".class")).replaceAll("\\\\", ".");
+                        String classFileNamePrefix = classFileName.substring(0, classFileName.lastIndexOf(".class")).replaceAll(Pattern.quote(File.separator), ".");
                         String classPath = crawlPackage + "." + fileName + "." + classFileNamePrefix;
                         Class<?> clazz = Class.forName(classPath);
                         Annotation[] annotations = clazz.getAnnotations();
@@ -236,19 +234,11 @@ public class CrawlerConfig {
         this.debugSwitch = debugSwitch;
     }
 
-    public String getCodezipPath() {
-        return codezipPath;
+    public String getCodePath() {
+        return codePath;
     }
 
-    public void setCodezipPath(String codezipPath) {
-        this.codezipPath = codezipPath;
-    }
-
-    public String getCodeunzipPath() {
-        return codeunzipPath;
-    }
-
-    public void setCodeunzipPath(String codeunzipPath) {
-        this.codeunzipPath = codeunzipPath;
+    public void setCodePath(String codePath) {
+        this.codePath = codePath;
     }
 }

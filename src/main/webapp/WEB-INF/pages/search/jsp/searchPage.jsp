@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@page import="java.io.File"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <!-- saved from url=(0028)https://searchcode.com/?q=ad -->
@@ -114,7 +115,7 @@
                     <div>
                         <h5>Filter Results</h5>
                         <div class="center">
-                            <a href="https://searchcode.com/?q=ad"
+                            <a href="../search/searchCode.html?clause=${searchClause}"
                                class="btn btn-xs btn-success filter-button">Remove</a>
                             <input type="submit" value="Apply" class="btn btn-xs btn-success filter-button">
                         </div>
@@ -143,7 +144,7 @@
                             <div class="code-result">
                                 <div>
                                     <h5>
-                                        <a href="../searchResource/searchFile.html?filePath=<c:out value="${hitDocument.path.replaceAll(\"</?strong>\",\"\")}"/>">${hitDocument.path.substring(hitDocument.path.indexOf("\\",hitDocument.path.indexOf("\\") + 1) + 1,hitDocument.path.length())}</a>
+                                        <a href="../searchResource/searchFile.html?filePath=<c:out value="${hitDocument.path.replaceAll(\"</?strong>\",\"\")}"/>">${hitDocument.path.substring(hitDocument.path.indexOf(File.separator,hitDocument.path.indexOf(File.separator) + 1) + 1,hitDocument.path.length())}</a>
                                         <small><a href="${hitDocument.gitPath}">git地址:${hitDocument.gitPath}</a>
                                             | ${hitDocument.language}
                                         </small>
@@ -194,7 +195,7 @@
                     <%
                     } else {
                     %>
-                    <li><a href="../search/searchCode.html?clause=${searchClause}&pageIndex=<%=k%>"><%=k%>
+                    <li><a href="../search/searchCodeFilter.html?clause=${searchClause}&pageIndex=<%=k%>&repository=${selectRepository}&language=${selectLanguage}"><%=k%>
                     </a></li>
                     <%
                             }

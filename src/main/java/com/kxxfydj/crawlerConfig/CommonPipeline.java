@@ -16,6 +16,7 @@ import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.pipeline.Pipeline;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,11 +164,21 @@ public class CommonPipeline implements Pipeline {
         logger.info("codeInfo对象缓存到redis中！共{}条", codeInfoKeys.size());
 
         //解压文件，并将文件保存到数据库codeContent表
-        logger.info("开始解压文件！");
-        FileUtils.unzipFiles(crawlerConfig.getCodezipPath() + File.separator + crawlerTask.getRepository(),
-                crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getRepository());
-        logger.info("文件入库！");
-        unzipService.fileToDatabase(crawlerTask.getRepository(), crawlerConfig.getCodeunzipPath(), false);
+//        logger.info("开始解压文件！");
+//        String filePath = crawlerConfig.getCodezipPath() + File.separator + crawlerTask.getRepository();
+//        String unzipPath = crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getRepository();
+//        File file = new File(unzipPath);
+//        if(file.exists()){
+//            logger.info("本地仓库发现原仓库目录存在，进行清空操作！");
+//            try {
+//                org.apache.commons.io.FileUtils.deleteDirectory(file);
+//            } catch (IOException e) {
+//                logger.info("删除文件出错！",e.getMessage(),e);
+//            }
+//        }
+//        FileUtils.unzipFiles(filePath,unzipPath);
+//        logger.info("文件入库！");
+        unzipService.fileToDatabase(crawlerTask.getRepository(), crawlerConfig.getCodePath(), false);
 
         //开始生成搜索全文索引
         logger.info("开始生成搜索全文索引");

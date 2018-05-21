@@ -132,7 +132,7 @@ public class GithubProcessor extends UpdateProcessor {
     protected String generateFilePath(String originPath, String branch) {
         String projectName = originPath.substring(0,originPath.indexOf(File.separator));
         String filePath = projectName+ File.separator + projectName + "-" + branch + originPath.substring(originPath.indexOf(File.separator),originPath.length());
-        return super.crawlerConfig.getCodeunzipPath() + File.separator + crawlerTask.getRepository() + File.separator + filePath;
+        return super.crawlerConfig.getCodePath() + File.separator + crawlerTask.getRepository() + File.separator + filePath;
     }
 
     @Override

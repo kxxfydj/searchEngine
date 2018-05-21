@@ -25,7 +25,7 @@ public class GitLabCrawler extends CrawlerBase {
                 .addHeader("Host", "gitlab.com");
 
 //        super.setProxy();
-        super.setFiddlerProxy();
+//        super.setFiddlerProxy();
         String url = "https://gitlab.com/explore/projects/" + crawlerTask.getUrlCondition();
         Request request = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
 

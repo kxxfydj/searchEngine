@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@page import="java.io.File"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!DOCTYPE html>
 <!-- saved from url=(0070)https://searchcode.com/file/1962134/Avidemux/autononreg/fpstest.js#l-1 -->
@@ -63,7 +64,7 @@
             })();
         </script>
         <h4 class="codepath"><a href="http://www.${codeInfo.repository}.com/${codeInfo.author}">${codeInfo.author}</a>
-            ${codeContent.path.substring(codeContent.path.indexOf("\\",codeContent.path.indexOf("\\") + 1) + 1,codeContent.path.length())} </h4>
+            ${codeContent.path.substring(codeContent.path.indexOf(File.separator,codeContent.path.indexOf(File.separator) + 1) + 1,codeContent.path.length())} </h4>
         <table class="table">
             <tbody>
             <tr>

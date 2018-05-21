@@ -42,7 +42,7 @@ public class GithubCrawler extends CrawlerBase {
         }
 
 //        super.setProxy();
-        super.setFiddlerProxy();
+//        super.setFiddlerProxy();
 
         Spider spider = Spider
                 .create(new GithubProcessor(site,codeInfoList,crawlerConfig,crawlerTask))

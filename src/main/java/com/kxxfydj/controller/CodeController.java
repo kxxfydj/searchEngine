@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,17 +56,19 @@ public class CodeController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "searchCodeFilter", method = RequestMethod.POST)
+    @RequestMapping(value = "searchCodeFilter")
     public ModelAndView searchCodeFilter(SearchParam formParam) {
         List<HitDocument> OriginHitDocumentList = getDocumentList(formParam.getClause());
-
+        if(OriginHitDocumentList == null || OriginHitDocumentList.isEmpty()){
+            return null;
+        }
         List<HitDocument> hitDocumentList = OriginHitDocumentList.stream().filter(document -> {
             if (StringUtils.isNotBlank(formParam.getLanguage()) && StringUtils.isNotBlank(formParam.getRepository())) {
                 return Objects.equals(document.getLanguage().toLowerCase(), formParam.getLanguage().toLowerCase())
                         && Objects.equals(document.getRepository().toLowerCase(), formParam.getRepository().toLowerCase());
-            }else if(StringUtils.isBlank(formParam.getLanguage()) || StringUtils.isNotBlank(formParam.getRepository())){
+            }else if(StringUtils.isBlank(formParam.getLanguage()) && StringUtils.isNotBlank(formParam.getRepository())){
                 return Objects.equals(document.getRepository().toLowerCase(), formParam.getRepository().toLowerCase());
-            }else if(StringUtils.isNotBlank(formParam.getLanguage()) || StringUtils.isBlank(formParam.getRepository())){
+            }else if(StringUtils.isNotBlank(formParam.getLanguage()) && StringUtils.isBlank(formParam.getRepository())){
                 return Objects.equals(document.getLanguage().toLowerCase(), formParam.getLanguage().toLowerCase());
             }else {
                 return true;
@@ -90,6 +93,8 @@ public class CodeController {
         }
         modelAndView.addObject("languageCount", languageCount);
         modelAndView.addObject("repositoryCount", repositoryCount);
+        modelAndView.addObject("selectRepository",formParam.getRepository());
+        modelAndView.addObject("selectLanguage",formParam.getLanguage());
 
         modelAndView.addObject("searchClause", formParam.getClause());
         return modelAndView;
@@ -101,6 +106,9 @@ public class CodeController {
             hitDocumentList = searchService.fieldSearch(clause);
         } else {
             hitDocumentList = searchService.defaultSearchContent(clause);
+        }
+        if(hitDocumentList == null){
+            return new ArrayList<>();
         }
         return hitDocumentList;
     }

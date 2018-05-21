@@ -53,7 +53,6 @@ public class SearchIndex {
     public List<HitDocument> searchIndex(String clauses) {
         try (
                 Directory directory = FSDirectory.open(Paths.get(engineConfig.getIndexFile()));
-
                 DirectoryReader reader = DirectoryReader.open(directory)
         ) {
             IndexSearcher indexSearcher = new IndexSearcher(reader);
@@ -65,7 +64,7 @@ public class SearchIndex {
             highlighter.setTextFragmenter(fragment);
             ScoreDoc[] hits = indexSearcher.search(query, 1000).scoreDocs;
 
-            List<HitDocument> documentList = handlerDocument(clauses,hits,indexSearcher,highlighter);
+            List<HitDocument> documentList = handlerDocument(clauses, hits, indexSearcher, highlighter);
             redisUtil.lSet("documentList:" + clauses, documentList, 60 * 60);   //一小时过期
             logger.info("lucene查询字段结果已缓存 clause:{}  并设置一小时过期", clauses);
 
@@ -92,20 +91,18 @@ public class SearchIndex {
                     String bestFragment = highlighter.getBestFragment(analyzer, luceneFiled, fieldContent);
                     field.set(document, bestFragment);
                 } else {
-                    field.set(document,hitDoc.get(field.getName()));
+                    field.set(document, hitDoc.get(field.getName()));
                 }
             }
             documentList.add(document);
+            //如果不是搜索content域，那么需要为结果中的content格式化标签语言
+            if (!luceneFiled.equalsIgnoreCase(EngineConfig.CONTENT.toLowerCase())) {
+                String content = StringEscapeUtils.escapeHtml(hitDoc.get(EngineConfig.CONTENT));
+                document.setContent(content);
+            }
         }
+
         return documentList;
     }
 
-    public static void main(String[] args) {
-        Class clazz = HitDocument.class;
-        Field[] fileds = clazz.getDeclaredFields();
-        for (Field field : fileds) {
-            System.out.println(field.getName());
-        }
-
-    }
 }

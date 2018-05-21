@@ -5,8 +5,9 @@ import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.entity.CrawlerTask;
 import com.kxxfydj.utils.FileUtils;
 import com.kxxfydj.utils.HeaderUtils;
-import com.kxxfydj.utils.HttpsUtils;
 import com.kxxfydj.utils.JsoupRequestData;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,12 +80,12 @@ public abstract class InsertProcessor implements PageProcessor {
         jsoupRequestData.setMaxSize(100 * 1024 * 1024); //100MB
         jsoupRequestData.setHeaders(requestHeaderMap);
         jsoupRequestData.setTimeOut(0);  //设置在下载底层实现中无限等待
-        jsoupRequestData.setFiddlerProxy();
+//        jsoupRequestData.setFiddlerProxy();
         Future<Boolean> f = executorService.submit(new DownloadTask(filePath, downloadPath, jsoupRequestData));
         try {
-            return f.get(5, TimeUnit.MINUTES);   //外部设置等待五分钟
+            return f.get(20, TimeUnit.MINUTES);   //外部设置等待20分钟
         } catch (Exception e) {
-            logger.error("文件下载超时，下载路径：{}", downloadPath);
+            logger.info("文件下载超时，下载路径：{} 错误日志：{}", downloadPath, e.getMessage(), e);
         }
         return false;
     }
@@ -110,18 +111,36 @@ public abstract class InsertProcessor implements PageProcessor {
 
         @Override
         public Boolean call() {
-            logger.info("downloading file {}", downloadPath);
+
+            File file = new File(filePath);
             long timestart = System.currentTimeMillis();
-
-            byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
-            long timeend = System.currentTimeMillis();
-            logger.info("download file complete {}, create file {}, 耗时：{}毫秒", downloadPath, filePath, timeend - timestart);
-            if (binaryData == null) {
-                return false;
+            if (file.exists()) {
+                if (FileUtils.deleteFiles(filePath)) {
+                    logger.info("发现项目文件目录：{} 已删除！", file.getAbsolutePath());
+                }else {
+                    logger.info("删除文件重试一次！ 文件名：{}",file.getAbsolutePath());
+                    FileUtils.deleteFiles(filePath);
+                }
             }
-
-            FileUtils.generateFile(filePath, binaryData);
-            logger.info("create file {} complete", filePath);
+//            byte[] binaryData = HttpsUtils.getBytes(downloadPath, jsoupRequestData, null);
+//            long timeend = System.currentTimeMillis();
+//            logger.info("download file complete {}, create file {}, 耗时：{}毫秒", downloadPath, filePath, timeend - timestart);
+//            if (binaryData == null) {
+//                return false;
+//            }
+//
+//            FileUtils.generateFile(filePath, binaryData);
+            logger.info("downloading file {}", downloadPath);
+            try (Git result = Git.cloneRepository()
+                    .setURI(downloadPath)
+                    .setDirectory(file)
+                    .call()) {
+                // Note: the call() returns an opened repository already which needs to be closed to avoid file handle leaks!
+                long endTime = System.currentTimeMillis();
+                logger.info("Having repository: {},耗时：{}毫秒", result.getRepository().getDirectory(), endTime - timestart);
+            } catch (GitAPIException e) {
+                logger.error("git下载出错，文件链接：{}，保存路径：{}", downloadPath, filePath);
+            }
             return true;
         }
     }

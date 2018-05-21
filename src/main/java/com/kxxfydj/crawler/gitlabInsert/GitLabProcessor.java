@@ -36,7 +36,7 @@ public class GitLabProcessor extends InsertProcessor {
     public GitLabProcessor(Site site, CrawlerTask crawlerTask) {
         super(site, crawlerTask);
         this.host = "gitlab.com";
-        this.referer = null;
+        this.referer = "https://gitlab.com";
         this.userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36";
     }
 
@@ -80,7 +80,7 @@ public class GitLabProcessor extends InsertProcessor {
         String gitPath = document.select("#project_clone").attr("value");
         String projectName = document.select("#content-body > div.project-home-panel.text-center > div > h1").text();
         String description = document.select("#content-body > div.project-home-panel.text-center > div > div.project-home-desc > p").text();
-        String downloadPath = document.select("#tree-holder > div.nav-block > div.tree-controls > div > ul > li:nth-child(2) > a").attr("href");
+//        String downloadPath = document.select("#tree-holder > div.nav-block > div.tree-controls > div > ul > li:nth-child(2) > a").attr("href");
         String author = document.select("body > div > div.content-wrapper > div.alert-wrapper > nav > div > div > ul > li:nth-child(1) > a").text();
 
         CodeInfo codeInfo = new CodeInfo();
@@ -91,10 +91,10 @@ public class GitLabProcessor extends InsertProcessor {
         codeInfo.setAuthor(author);
         codeInfo.setRepository(crawlerTask.getRepository());
 
-        String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
+        String filePath = this.filePath + File.separator + projectName;
         codeInfo.setFilePath(filePath);
 
-        return new Triplet<>(filePath, downloadPath, codeInfo);
+        return new Triplet<>(filePath, gitPath, codeInfo);
     }
 
     @Override

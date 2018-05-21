@@ -44,7 +44,7 @@ public class GitlabCrawler extends CrawlerBase {
             requests[i] = RequestUtil.createGetRequest(url, CommonTag.FIRST_PAGE);
         }
 
-        super.setFiddlerProxy();
+//        super.setFiddlerProxy();
         Spider spider = Spider
                 .create(new GitLabProcessor(site, this.crawlerTask))
                 .setDownloader(new MyHttpClientDownloader(this))

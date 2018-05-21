@@ -6,6 +6,7 @@ import com.kxxfydj.entity.CodeContent;
 import com.kxxfydj.entity.CodeInfo;
 import com.kxxfydj.redis.RedisUtil;
 import com.kxxfydj.service.CodeContentService;
+import com.kxxfydj.service.CodeInfoService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by kxxfydj on 2018/5/7.
@@ -25,6 +29,9 @@ import java.util.List;
 public class FileSearchController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileSearchController.class);
+
+    @Autowired
+    private CodeInfoService codeInfoService;
 
     @Autowired
     private CodeContentService codeContentService;
@@ -42,10 +49,10 @@ public class FileSearchController {
             return null;
         }
         String wholePath;
-        if(filePath.startsWith("\\")){
-            wholePath = crawlerConfig.getCodeunzipPath() + filePath;
+        if(filePath.startsWith(File.separator)){
+            wholePath = crawlerConfig.getCodePath() + filePath;
         }else {
-            wholePath = crawlerConfig.getCodeunzipPath() + File.separator + filePath;
+            wholePath = crawlerConfig.getCodePath() + File.separator + filePath;
         }
 
         CodeContent codeContent = codeContentService.getFile(wholePath);
@@ -54,7 +61,17 @@ public class FileSearchController {
         }
         CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
         if(codeInfo == null){
-            return null;
+            List<CodeInfo> codeInfoList = codeInfoService.getAllCodeInfo();
+            //更新redis缓存
+            List<String> codeInfoKeys = new ArrayList<>();
+            for (CodeInfo ci : codeInfoList) {
+                codeInfoKeys.add(RedisKeys.CODEINFOID.getKey() + ":" + ci.getId());
+            }
+            redisUtil.setForBatch(codeInfoKeys,codeInfoList);
+            codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
+            if(codeInfo == null){
+                return null;
+            }
         }
         ModelAndView modelAndView = new ModelAndView("search/jsp/searchFile.jsp");
         modelAndView.addObject("codeContent", codeContent);
@@ -76,13 +93,15 @@ public class FileSearchController {
         }
 
         StringBuilder htmlString = new StringBuilder("{\"tree\": \"");
-        String rootPath = crawlerConfig.getCodeunzipPath() + File.separator + codeInfo.getRepository() + File.separator + codeInfo.getProjectName();
+        String rootPath = crawlerConfig.getCodePath() + File.separator + codeInfo.getRepository() + File.separator + codeInfo.getProjectName();
         for(String filePath : fileList){
             String relativePath = filePath.substring(rootPath.length() + 1,filePath.length());
-            htmlString.append("<a href=\\\"./searchFile.html?filePath=" + filePath.substring(crawlerConfig.getCodeunzipPath().length() + 1, filePath.length()).replaceAll("\\\\","\\\\\\\\") + "\\\">/" + relativePath.replaceAll("\\\\","\\\\\\\\") + "</a><br>");
+            htmlString.append("<a href=\\\"./searchFile.html?filePath=" +
+                    filePath.substring(crawlerConfig.getCodePath().length() + 1, filePath.length()).replaceAll(Pattern.quote(File.separator),Matcher.quoteReplacement(File.separator) + Matcher.quoteReplacement(File.separator)) + "\\\">/" +
+                    relativePath.replaceAll(Pattern.quote(File.separator), Matcher.quoteReplacement(File.separator) + Matcher.quoteReplacement(File.separator)) +
+                    "</a><br>");
         }
         htmlString.append("\"}");
-//        StringBuilder htmlString = new StringBuilder("{\"tree\": \"<a href=\\\"/file/37250932/header.txt\\\">/header.txt</a>\"}");
         return htmlString.toString();
     }
 }

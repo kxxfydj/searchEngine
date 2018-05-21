@@ -85,7 +85,7 @@ public class GitHubProcessor extends InsertProcessor {
         String description = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.js-repo-meta-container > div.repository-meta.mb-0.js-repo-meta-edit.js-details-container > div > span").first().text();
         int stars = NumberFormatUtil.formatInt(document.select("#js-repo-pjax-container > div.pagehead.repohead.instapaper_ignore.readability-menu.experiment-repo-nav > div > ul > li:nth-child(2) > a.social-count.js-social-count").text());
         String gitPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.clone-options.https-clone-options > div > input").first().attr("value");
-        String downloadPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.mt-2 > a").first().attr("href");
+//        String downloadPath = document.select("#js-repo-pjax-container > div.container.new-discussion-timeline.experiment-repo-nav > div.repository-content > div.file-navigation.in-mid-page > details > div > div > div.get-repo-modal-options > div.mt-2 > a").first().attr("href");
 
         CodeInfo codeInfo = new CodeInfo();
         codeInfo.setDescription(description);
@@ -96,10 +96,10 @@ public class GitHubProcessor extends InsertProcessor {
         codeInfo.setRepository(CrawlerTypeEnum.GITHUB.getType());
         codeInfo.setGitPath(gitPath);
 
-        String filePath = this.filePath + File.separator + projectName + File.separator + projectName + ".zip";
+        String filePath = this.filePath + File.separator + projectName;
         codeInfo.setFilePath(filePath);
 
-        return new Triplet<>(filePath, downloadPath, codeInfo);
+        return new Triplet<>(filePath, gitPath, codeInfo);
     }
 
     @Override

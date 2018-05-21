@@ -28,6 +28,9 @@ public class ProxyServiceImp implements ProxyService {
 
     @Override
     public int updateProxies(List<Proxy> proxyList) {
+        if(proxyList== null || proxyList.isEmpty()){
+            return 0;
+        }
         return proxyMapper.batchUpdate(proxyList);
     }
 

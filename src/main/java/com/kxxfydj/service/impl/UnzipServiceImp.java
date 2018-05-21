@@ -34,6 +34,8 @@ public class UnzipServiceImp implements UnzipService {
     @Autowired
     private CodeInfoService codeInfoService;
 
+//    private boolean truncate = false;
+
     @Override
     public void fileToDatabase(String repository, String filePath, boolean isUpdate) {
         ExecutorService sqlTransactionService = new ThreadPoolExecutor(4,8,5,TimeUnit.MINUTES,new LinkedBlockingDeque<>());
@@ -69,12 +71,19 @@ public class UnzipServiceImp implements UnzipService {
                 }
             }
         }
-
+        //将表清空标志恢复
+//        this.truncate = false;
     }
 
     private void dataToDatabase(ExecutorService sqlTransactionService, List<CodeContent> codeContentList, boolean isUpdate) {
         logger.info("codeContentList size:{}", codeContentList.size());
         int handlerSize = 500;
+        //如果没有清空过表，清空表
+//        if(!truncate){
+//            logger.info("开始清空codecontent表！");
+//            codeContentService.truncateTable();
+//            truncate = true;
+//        }
         for (int i = 0; i < codeContentList.size(); i += handlerSize) {
             int end = i + handlerSize;
             int start = i;
@@ -88,7 +97,7 @@ public class UnzipServiceImp implements UnzipService {
     }
 
     private void handlerLeafFile(CodeInfo codeInfo, File file, List<CodeContent> codeContentList) {
-        if (file.isDirectory()) {
+        if (file.isDirectory() && !file.getName().contains(".git")) {
             File[] fileChildren = file.listFiles();
             for (File childFile : fileChildren) {
                 if (childFile.isDirectory()) {

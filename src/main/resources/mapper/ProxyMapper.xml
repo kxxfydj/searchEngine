@@ -23,7 +23,7 @@
             #{proxy.enabled,jdbcType=TINYINT}
             )
         </foreach>
-      on DUPLICATE KEY UPDATE
+        on DUPLICATE KEY UPDATE
         <trim prefix="speed =case" suffix="end,">
             <foreach collection="list" item="proxy">
                 <if test="proxy.speed!=null">
@@ -57,11 +57,11 @@
 
             <!-- 拼接case when  -->
             <!--<trim prefix="ip =case" suffix="end,">-->
-                <!--<foreach collection="list" item="proxy">-->
-                    <!--<if test="proxy.ip!=null">-->
-                        <!--when ip=#{proxy.ip} then #{proxy.ip}-->
-                    <!--</if>-->
-                <!--</foreach>-->
+            <!--<foreach collection="list" item="proxy">-->
+            <!--<if test="proxy.ip!=null">-->
+            <!--when ip=#{proxy.ip} then #{proxy.ip}-->
+            <!--</if>-->
+            <!--</foreach>-->
             <!--</trim>-->
             <trim prefix="port =case" suffix="end,">
                 <foreach collection="list" item="proxy">
@@ -99,17 +99,28 @@
                 </foreach>
             </trim>
         </trim>
-        <where>
-            ip in (
-            <foreach collection="list" separator="," item="proxy">
-                #{proxy.ip}
-            </foreach>
-            )
-        </where>
+
+        WHERE ip in
+        <foreach collection="list" separator="," item="proxy" open="(" close=")">
+            #{proxy.ip}
+        </foreach>
+
     </update>
 
-    <update id="update" parameterType="com.kxxfydj.entity.Proxy" >
+    <update id="update" parameterType="com.kxxfydj.entity.Proxy">
         UPDATE proxy SET speed = #{speed}, usedTimes = #{usedTimes}, enabled = #{enabled} WHERE ip = #{ip};
     </update>
+
+    <!--<update id="batchUpdate" parameterType="java.util.List">-->
+        <!--<foreach collection="list" item="item">-->
+            <!--update proxy set-->
+            <!--port=#{item.port},-->
+            <!--type=#{item.type},-->
+            <!--speed=#{item.speed},-->
+            <!--usedTimes=#{item.usedTimes},-->
+            <!--enabled=#{item.enabled}-->
+            <!--where ip = #{item.ip};-->
+        <!--</foreach>-->
+    <!--</update>-->
 
 </mapper>

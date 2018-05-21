@@ -16,10 +16,12 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by kxxfydj on 2018/4/2.
@@ -56,7 +58,7 @@ public class IndexManager {
         ) {
             for (CodeContent codeContent : codeContentList) {
                 Document document = new Document();
-                String[] paths = codeContent.getPath().split("\\\\");
+                String[] paths = codeContent.getPath().split(Pattern.quote(File.separator));
                 String first = "";
                 String[] others = null;
                 if (paths.length == 1) {
@@ -65,7 +67,7 @@ public class IndexManager {
                     first = paths[0];
                     others = Arrays.copyOfRange(paths, 1, paths.length);
                 }
-                int startindex = engineConfig.getUnzipFilePath().split("\\\\").length - 1;
+                int startindex = engineConfig.getUnzipFilePath().split(Pattern.quote(File.separator)).length - 1;
                 Path filePath = Paths.get(first, others);
                 CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
                 document.add(new StringField(EngineConfig.FILENAME, filePath.getFileName().toString(), Field.Store.YES));

@@ -43,7 +43,8 @@ public abstract class CrawlerBase implements Crawler {
 
     private void initSite(){
         site = Site.me().
-                setSleepTime(crawlerConfig.getThreadPoolIdleSleepTime());
+                setSleepTime(crawlerConfig.getThreadPoolIdleSleepTime())
+                .setTimeOut(15*1000);
     }
 
     @Override
@@ -79,12 +80,14 @@ public abstract class CrawlerBase implements Crawler {
 
     public void changeProxy(){
         ProxyCenter proxyCenter = ApplicationContextUtils.getBean(ProxyCenter.class);
-        HttpHost oringinHttpHost = this.site.getHttpProxy();
-        Proxy proxy = new Proxy(oringinHttpHost.getHostName(),oringinHttpHost.getPort());
-        java.net.Proxy newProxy = proxyCenter.changeProxy(proxy);
-        InetSocketAddress socketAddress = (InetSocketAddress) newProxy.address();
-        HttpHost httpHost = new HttpHost(socketAddress.getHostName(),socketAddress.getPort());
-        site.setHttpProxy(httpHost);
+        if(proxyCenter != null && crawlerConfig.isProxySwitch()) {
+            HttpHost oringinHttpHost = this.site.getHttpProxy();
+            Proxy proxy = new Proxy(oringinHttpHost.getHostName(), oringinHttpHost.getPort());
+            java.net.Proxy newProxy = proxyCenter.changeProxy(proxy);
+            InetSocketAddress socketAddress = (InetSocketAddress) newProxy.address();
+            HttpHost httpHost = new HttpHost(socketAddress.getHostName(), socketAddress.getPort());
+            site.setHttpProxy(httpHost);
+        }
     }
 
     public String getProxyIp(){

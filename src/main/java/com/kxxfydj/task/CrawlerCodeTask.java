@@ -31,6 +31,7 @@ public class CrawlerCodeTask {
     @Value("#{settings['crawler.crawlerCode.hasCrawlered']}")
     private boolean hasCrawlered;
 
+    @Scheduled(cron = "0 30 23/1 * * ?")
     public void crawlerCode() {
         hasCrawlered = true;
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getInsertRepostitory();
@@ -38,7 +39,7 @@ public class CrawlerCodeTask {
         worker.start(crawlerTaskList);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+//    @Scheduled(cron = "0 30 23 * * ?")
     public void updateCode() {
         if (!hasCrawlered) {
             crawlerCode();
@@ -55,7 +56,7 @@ public class CrawlerCodeTask {
         for (CodeRepository codeRepository : codeRepositoryList) {
             CrawlerTask crawlerTask = new CrawlerTask();
             crawlerTask.setCrawlerName(codeRepository.getCrawlerName());
-            crawlerTask.setCodeFilePath(crawlerConfig.getCodezipPath());
+            crawlerTask.setCodeFilePath(crawlerConfig.getCodePath());
             crawlerTask.setUrlCondition(codeRepository.getUrlCondition());
             crawlerTask.setRepository(codeRepository.getRepositoryName());
             crawlerTask.setFilterCount(codeRepository.getFilterCount());
