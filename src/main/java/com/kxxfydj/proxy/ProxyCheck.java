@@ -71,6 +71,7 @@ public class ProxyCheck {
             try {
                 executor.awaitTermination(5, TimeUnit.MINUTES);
             }catch (InterruptedException e1){
+                executor.shutdownNow();
                 logger.error("代理检验程序出错，线程池执行时间过长,停止！");
             }
         }

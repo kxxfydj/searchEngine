@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@page import="java.io.File"%>
+<%@page import="java.net.URLEncoder"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <!-- saved from url=(0028)https://searchcode.com/?q=ad -->
@@ -144,7 +145,7 @@
                             <div class="code-result">
                                 <div>
                                     <h5>
-                                        <a href="../searchResource/searchFile.html?filePath=<c:out value="${hitDocument.path.replaceAll(\"</?strong>\",\"\")}"/>">${hitDocument.path.substring(hitDocument.path.indexOf(File.separator,hitDocument.path.indexOf(File.separator) + 1) + 1,hitDocument.path.length())}</a>
+                                        <a href="../searchResource/searchFile.html?filePath=<c:out value="${URLEncoder.encode(hitDocument.path.replaceAll(\"</?strong>\",\"\"))}"/>">${hitDocument.path.substring(hitDocument.path.indexOf(File.separator,hitDocument.path.indexOf(File.separator) + 1) + 1,hitDocument.path.length())}</a>
                                         <small><a href="${hitDocument.gitPath}">git地址:${hitDocument.gitPath}</a>
                                             | ${hitDocument.language}
                                         </small>

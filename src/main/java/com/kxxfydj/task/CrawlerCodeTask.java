@@ -31,7 +31,7 @@ public class CrawlerCodeTask {
     @Value("#{settings['crawler.crawlerCode.hasCrawlered']}")
     private boolean hasCrawlered;
 
-    @Scheduled(cron = "0 30 23/1 * * ?")
+//    @Scheduled(cron = "0 30 23/1 * * ?")
     public void crawlerCode() {
         hasCrawlered = true;
         List<CodeRepository> codeRepositoryList = codeRepositoryService.getInsertRepostitory();

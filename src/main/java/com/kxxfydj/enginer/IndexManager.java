@@ -67,7 +67,7 @@ public class IndexManager {
                     first = paths[0];
                     others = Arrays.copyOfRange(paths, 1, paths.length);
                 }
-                int startindex = engineConfig.getUnzipFilePath().split(Pattern.quote(File.separator)).length - 1;
+                int startindex = engineConfig.getZipFilePath().split(Pattern.quote(File.separator)).length - 1;
                 Path filePath = Paths.get(first, others);
                 CodeInfo codeInfo = redisUtil.get(RedisKeys.CODEINFOID.getKey() + ":" + codeContent.getCodeInfoId());
                 document.add(new StringField(EngineConfig.FILENAME, filePath.getFileName().toString(), Field.Store.YES));

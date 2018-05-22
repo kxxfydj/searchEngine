@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -97,7 +98,7 @@ public class FileSearchController {
         for(String filePath : fileList){
             String relativePath = filePath.substring(rootPath.length() + 1,filePath.length());
             htmlString.append("<a href=\\\"./searchFile.html?filePath=" +
-                    filePath.substring(crawlerConfig.getCodePath().length() + 1, filePath.length()).replaceAll(Pattern.quote(File.separator),Matcher.quoteReplacement(File.separator) + Matcher.quoteReplacement(File.separator)) + "\\\">/" +
+                    URLEncoder.encode(filePath.substring(crawlerConfig.getCodePath().length() + 1, filePath.length()).replaceAll(Pattern.quote(File.separator),Matcher.quoteReplacement(File.separator))) + "\\\">/" +
                     relativePath.replaceAll(Pattern.quote(File.separator), Matcher.quoteReplacement(File.separator) + Matcher.quoteReplacement(File.separator)) +
                     "</a><br>");
         }

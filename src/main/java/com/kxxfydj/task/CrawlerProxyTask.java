@@ -18,7 +18,7 @@ public class CrawlerProxyTask {
     @Autowired
     Worker worker;
 
-//    @Scheduled(cron = "0 50 17 * * ? ")
+    @Scheduled(cron = "0 30 22 * * ? ")
     public void crawlerProxy(){
         List<CrawlerTask> crawlerTaskList = new ArrayList<>();
         CrawlerTask crawlerTask = new CrawlerTask();
